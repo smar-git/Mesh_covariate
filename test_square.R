@@ -22,6 +22,9 @@ library(scico)
 library(terra)
 rm(list = ls())
 
+set.seed(124545)
+plot_save_dir  = "presentation/plots/test_mesh/"
+
 
 theme_maps = list(theme(axis.title.x=element_blank(),
                         axis.text.x=element_blank(),
@@ -60,7 +63,7 @@ meshes[[1]] =  fm_mesh_2d_inla(boundary = poly,
 
 
 ggplot() + gg(meshes[[1]]) + coord_equal()
-n_meshes = 4
+n_meshes = 5
 for(i in 2:n_meshes)
   meshes[[i]] = fmesher:::fm_subdivide(meshes[[i-1]])
 
@@ -190,7 +193,7 @@ ggplot() + geom_spatraster(data = cov3)+
   
   plot_layout(ncol = 2)
 
-
+ggsave(paste(plot_save_dir,"simulatedPP.png",sep = ""))
 if(0)
   {
   data.frame( terra::extract(cov1, rbind(st_coordinates(points1), crds(cov1)))) %>% 
@@ -211,6 +214,14 @@ data.frame( terra::extract(cov3, rbind(st_coordinates(points3), crds(cov3)))) %>
 }
 
 
+
+# plot meshes -------------------------------------------------------------
+
+for(i in 1:n_meshes)
+{
+  ggplot() + gg(meshes[[i]]) + theme_maps + coord_equal()
+  ggsave(paste(plot_save_dir,"mesh",i,".png",sep = ""))
+}
 # FIT MODELS ----------------------------------------------------------------
 
 bru_options_set(bru_verbose = 2)
@@ -300,8 +311,9 @@ rbind(aa1, aa2,aa3 ) %>%
   ggplot() + geom_point(aes(x = mean, y = int_points)) +
   geom_segment(aes(y = int_points, yend  = int_points, x = `0.025quant`, xend = `0.975quant`)) +
   geom_vline(aes(xintercept = true), linetype = "dashed") + 
-  facet_grid(cov~ names, scales = "free") 
+  facet_grid(cov~ names, scales = "free")  + xlab("") + ylab("")
 
+ggsave(paste(plot_save_dir, "results.png", sep = ""))
 
 rbind(aa1, aa2,aa3 ) %>% 
   filter(names=="Int") %>%
@@ -321,3 +333,4 @@ rbind(aa1, aa2, aa3 ) %>%
   geom_vline(aes(xintercept = true), linetype = "dashed") + 
   facet_grid(cov~ ., scales = "free") +
   ggtitle("covariate")
+

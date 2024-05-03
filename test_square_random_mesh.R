@@ -11,7 +11,7 @@
 #+ echo = FALSE
 knitr::opts_chunk$set(collapse = TRUE, echo = FALSE,
                       message = FALSE, warning = FALSE,
-                      fig.width=5, fig.height=5)
+                      fig.width=7, fig.height=7)
 
 
 
@@ -25,8 +25,10 @@ library(tidyterra)
 library(scico)
 library(terra)
 rm(list = ls())
-
+source("book_mesh_dual.R")
 set.seed(123)
+
+plot_save_dir  = "presentation/plots/random_mesh/"
 theme_maps = list(theme(axis.title.x=element_blank(),
                         axis.text.x=element_blank(),
                         axis.ticks.x=element_blank(),
@@ -102,24 +104,24 @@ for(i in 1:n_meshes)
 
 ggplot() + gg(meshes[[1]]) +  geom_sf(data = poly, alpha = 0, color = "red") +
   coord_sf(xlim = c(-100,600), ylim = c(-100,600)) + ggtitle("Mesh 1") +
-  xlab("") + ylab("") +
+  xlab("") + ylab("") + theme_maps +
 ggplot() + gg(meshes[[2]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 2") +
-  xlab("") + ylab("") +
+  xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[3]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 3") +
-  xlab("") + ylab("") +
+  xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[4]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 4") +
-  xlab("") + ylab("") +
+  xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 5") +
-  xlab("") + ylab("") +
+  xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
-  xlab("") + ylab("") 
+  xlab("") + ylab("")+  theme_maps 
 
- 
+ ggsave(paste(plot_save_dir,"meshes.png", sep = ""))
 
 
 sapply(meshes, function(x)x$n)
@@ -188,8 +190,109 @@ val =  as.vector((A%*%samp3[,1]))
 values(cov3) = val - mean(val)
 names(cov3) =  "val"
 
+
+
+ggplot() + geom_spatraster(data = cov1) + theme_maps + theme(legend.position  = "none") +
+  ggtitle("Covariate 1") + 
+  ggplot() + geom_spatraster(data = cov2) + theme_maps + theme(legend.position   = "none") +
+  ggtitle("Covariate 2") + 
+  ggplot() + geom_spatraster(data = cov3) + theme_maps + theme(legend.position   = "none") +
+  ggtitle("Covariate 3") + plot_layout(ncol = 2)
+ggsave(paste(plot_save_dir,"covariates.png",sep =""))
+  
+
+
 #ggplot() + geom_spatraster(data = cov3) + scale_fill_scico( direction = -1) +
 #  gg(meshes[[1]])
+
+# covariates at mesh nodes ------------------------------------------------
+
+
+
+mesh_nodes = c()
+for(i in 1:n_meshes)
+{
+  mesh_nodes  = rbind(mesh_nodes, 
+                      data.frame(x = meshes[[i]]$loc[,1],
+                                 y = meshes[[i]]$loc[,2],
+                                 mesh = i))
+ 
+}
+
+mesh_nodes = st_as_sf(mesh_nodes, coords = c("x","y"))
+mesh_nodes$cov1 = extract(cov1, mesh_nodes)$val
+mesh_nodes$cov2 = extract(cov2, mesh_nodes)$val
+mesh_nodes$cov3 = extract(cov3, mesh_nodes)$val
+
+
+mesh_nodes$cov1 =  bru_fill_missing(cov1, mesh_nodes, mesh_nodes$cov1)
+mesh_nodes$cov2 =  bru_fill_missing(cov2, mesh_nodes, mesh_nodes$cov2)
+mesh_nodes$cov3 =  bru_fill_missing(cov3, mesh_nodes, mesh_nodes$cov3)
+
+head(mesh_nodes)
+dual = list()
+int = list()
+weights = c()
+for(i in 1:n_meshes)
+{
+  
+  dual[[i]] = st_as_sf(book.mesh.dual(meshes[[i]]))
+  dual[[i]]$cov1 = mesh_nodes %>% filter(mesh==i) %>% pull(cov1)
+  dual[[i]]$cov2 = mesh_nodes %>% filter(mesh==i) %>% pull(cov2)
+  dual[[i]]$cov3 = mesh_nodes %>% filter(mesh==i) %>% pull(cov3)
+  
+  int[[i]] = st_intersection(dual[[i]], poly)
+  int[[i]]$weights = st_area(int[[i]])/st_area(poly)
+  
+  int[[i]] = int[[i]] %>%
+    mutate(int1 = cov1*weights,
+           int2 = cov2*weights,
+           int3 = cov3*weights)
+  int[[i]]$mesh = i
+  
+}
+
+data.frame(mesh = paste("mesh",1:6,sep = ""),
+  cov1 = sapply(int, function(x) sum(x$int1, na.rm = T)),
+  cov2 = sapply(int, function(x) sum(x$int2, na.rm = T)),
+  cov3 = sapply(int, function(x) sum(x$int3, na.rm = T))) %>%
+  pivot_longer(-mesh) %>%
+  ggplot() + geom_line(aes(mesh, value, group = name, color = name))
+
+ggsave(paste(plot_save_dir, "integrated_cov.png",sep = ""))
+
+
+ints = rbind(int[[1]], int[[2]], int[[3]], int[[4]], int[[5]], int[[6]])
+#+ fig.width=7, fig.height=7
+ggplot() + geom_sf(data = mesh_nodes, aes(color = cov1)) + facet_wrap(.~mesh)  +
+  xlim(c(0,500)) + ylim(c(0,500)) +
+  theme_maps + theme(legend.position = "none")+
+  geom_sf(data = poly, alpha = 0) + 
+  geom_sf(data = ints, alpha = 0) + 
+  ggtitle("Covariate 1")
+ggsave(paste(plot_save_dir,"cov1_points.png", sep = ""))
+
+
+#+ fig.width=7, fig.height=7
+ggplot() + geom_sf(data = mesh_nodes, aes(color = cov2)) + facet_wrap(.~mesh)  +
+  xlim(c(0,500)) + ylim(c(0,500)) + 
+  theme_maps + theme(legend.position = "none")+
+  geom_sf(data = poly, alpha = 0) + 
+  geom_sf(data = ints, alpha = 0) + 
+  
+  theme(legend.position = "none") + ggtitle("Covariate 2")
+ggsave(paste(plot_save_dir,"cov2_points.png", sep = ""))
+
+#+ fig.width=7, fig.height=7
+ggplot() + geom_sf(data = mesh_nodes, aes(color = cov3)) + facet_wrap(.~mesh)  +
+  xlim(c(0,500)) + ylim(c(0,500)) + 
+  theme_maps + theme(legend.position = "none") + 
+  geom_sf(data = poly, alpha = 0) + 
+  geom_sf(data = ints, alpha = 0) + 
+  
+  theme(legend.position = "none") + ggtitle("Covariate 3")
+ggsave(paste(plot_save_dir,"cov3_points.png", sep = ""))
+
 
 # simulate a point process ------------------------------------------------
 
@@ -246,8 +349,12 @@ ggplot() + geom_spatraster(data = cov3)+
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
   
-  plot_layout(ncol = 2)
+  plot_layout(ncol = 2, ) +
+  plot_annotation(
+    title = 'Simulated PP'
+  )
 
+ggsave(paste(plot_save_dir, "simulatedPP.png"))
 
 if(1)
 
@@ -358,7 +465,7 @@ rbind(aa1, aa2,aa3 ) %>%
   ggplot() + geom_point(aes(x = mean, y = int_points)) +
   geom_segment(aes(y = int_points, yend  = int_points, x = `0.025quant`, xend = `0.975quant`)) +
   geom_vline(aes(xintercept = true), linetype = "dashed") + 
-  facet_grid(cov~ names, scales = "free") 
-
+  facet_grid(cov~ names, scales = "free") + xlab("") + ylab("")
+ggsave(paste(plot_save_dir,"results.png",sep =""))
 
   
