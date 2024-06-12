@@ -57,7 +57,10 @@ This is the `iheiddown_betterport` template for the `{iheiddown}`
 provides the user with an IHEID version of the template by default. The
 original `{posterdown}` template was inspired by the twitter thread of
 [Mike
-Morrison](https://mobile.twitter.com/mikemorrison/status/1110191245035479041).
+Morrison](https://mobile.twitter.com/mikemorrison/status/1110191245035479041).Pleaase
+check also this [wiki
+page](https://github.com/brentthorne/posterdown/wiki/posterdown_betterport)
+with another similar package: Posterdown [@posterdown].
 
 ```{r, include=FALSE}
 # Writing the bibliography of the packages you're using to create the current
