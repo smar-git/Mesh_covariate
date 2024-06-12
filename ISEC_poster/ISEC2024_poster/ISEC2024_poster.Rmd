@@ -91,9 +91,9 @@ $$
 To reference a citation you can add your `.bib` file to the working
 directory and name it in the YAML metadata or generate an automated one
 as done here, then you only need to reference the label value in the
-`.bib` file. For example this package is built on top of the wonderful
-{pagedown} package and I will cite it at the end of this sentance using
-this in the rmd `[@R-pagedown]` [@R-pagedown].
+`.bib` file [@dambly2023]. For example this package is built on top of
+the wonderful {pagedown} package and I will cite it at the end of this
+sentence using this in the rmd [@pagedown].
 
 To get a better understanding of how to include features like these
 please refer to the {iheiddown}
@@ -146,5 +146,3 @@ knitr::kable(
 ```
 
 # References
-
-[@dambly2023]
