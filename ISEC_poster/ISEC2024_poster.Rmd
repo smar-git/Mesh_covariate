@@ -1,7 +1,7 @@
 ---
 main_topsize: 0.2 #percent coverage of the poster
 main_bottomsize: 0.1
-title: '**A Better Reproducible Poster Title**'
+title: '**Spatial Point Processes modelling with INLA/SPDE: are finer covariate resolutions always better?**'
 author:
   - name: '**Gandalf the Grey**'
     affil: 1
@@ -23,7 +23,7 @@ affiliation:
   - num: 3
     address:  Department of Wraith-World Studies, Eastern University of Middle Earth
 main_findings:
-  - "Make **better posters** with RMarkdown + **{iheiddown}**."
+  - "**Inadequate model covariate resolution relative to that of the mesh can lead to highly unreliable numerical integration**."
 logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logocenter_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
@@ -57,7 +57,7 @@ This is the `iheiddown_betterport` template for the `{iheiddown}`
 provides the user with an IHEID version of the template by default. The
 original `{posterdown}` template was inspired by the twitter thread of
 [Mike
-Morrison](https://mobile.twitter.com/mikemorrison/status/1110191245035479041).Pleaase
+Morrison](https://mobile.twitter.com/mikemorrison/status/1110191245035479041).Please
 check also this [wiki
 page](https://github.com/brentthorne/posterdown/wiki/posterdown_betterport)
 with another similar package: Posterdown [@posterdown].
