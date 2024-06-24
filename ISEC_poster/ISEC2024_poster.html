@@ -8,7 +8,7 @@
 
 
 
-<title>Spatial Point Processes modelling with INLA: are finer covariate resolutions always better?</title>
+<title>Spatial Point Processes with INLA: are finer covariate resolutions always better?</title>
 
 
 
@@ -450,39 +450,55 @@ span > #tab:mytable {
 
 <div class="column outer">
 <div class="section">
-<h1 id="title"><strong>Spatial Point Processes modelling with INLA: are finer covariate resolutions always better?</strong></h1><br>
+<h1 id="title"><strong>Spatial Point Processes with INLA: are finer covariate resolutions always better?</strong></h1><br>
 <h3 id="author" class="author">
 
-<strong>Gandalf the Grey</strong><sup> 1, <a class="orcid" href="https://orcid.org/0000-0002-1825-0097"><img src="https://raw.githubusercontent.com/brentthorne/posterdown/master/images/orcid.jpg"></a></sup><br>
-<a class="twitter" href="https://mobile.twitter.com/IHEID"><i class="fab fa-twitter"></i>&nbsp;&nbsp;@IHEID</a><br>
+Sara Martino<sup> 1</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:example@example.ch" class="email">example@example.ch</a> <br>
- Frodo Baggins<sup> 2</sup><br>
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:sara.martino@ntnu.no" class="email">sara.martino@ntnu.no</a> <br>
+ Leonardo Capitani<sup> 2</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:ag.con@iheiddown.net" class="email">ag.con@iheiddown.net</a> <br>
- </h3>
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:leocapi07@gmail.com" class="email">leocapi07@gmail.com</a> <br>
+ Virginia Morera-Pujol<sup> 3</sup><br>
+
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:morera.virginia@gmail.com" class="email">morera.virginia@gmail.com</a> <br>
+ Erin Bryce<sup> 4</sup><br>
+
+ Jafet Belmont<sup> 5</sup><br>
+
+ Megan Morton<sup> 6</sup><br>
+
+ Janine Illian<sup> 7</sup><br>
+
+</h3>
 
 <h5 id="author_extra", class="author_extra">
-  Bilbo<sup>3</sup>
-</h5>
+      </h5>
 
 
 <p id="affiliation" class="affiliation">
-<sup>1</sup> Department of International Ring Study, Central University of Middle Earth<br> <sup>2</sup> Department of Dragon Studies, Northern University of Middle Earth<br> <sup>3</sup> Department of Wraith-World Studies, Eastern University of Middle Earth
+<sup>1</sup> Department of Mathematical Sciences, Norwegian University of Science and Technology<br> <sup>2</sup> Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland<br> <sup>3</sup> Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
 </p>
 </div>
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>This is the <code>iheiddown_betterport</code> template for the <code>{iheiddown}</code>
-<span class="citation">(<a href="#ref-iheiddown"><strong>iheiddown?</strong></a>)</span> package! Based on the great <code>{posterdown}</code> package, it
-provides the user with an IHEID version of the template by default. The
-original <code>{posterdown}</code> template was inspired by the twitter thread of
-<a href="https://mobile.twitter.com/mikemorrison/status/1110191245035479041">Mike
-Morrison</a>.Please
-check also this <a href="https://github.com/brentthorne/posterdown/wiki/posterdown_betterport">wiki
-page</a>
-with another similar package: Posterdown <span class="citation">(<a href="#ref-posterdown"><strong>posterdown?</strong></a>)</span>.</p>
+<!--# Author's order: Which is the author's order on the abstract? Please Virginia take care of this as you have it on your laptop.-->
+<p>In ecology, spatial point processes (SPP) have become a popular
+statistical tool to model presence only data, both on their own, and as
+a building block for model complex models (i.e. integrated species
+distribution models). However, inference on SPP, particularly when
+incorporating spatially explicit random effects, poses significant
+complexity. A common strategy involves adopting the so-called
+log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
+implementation for efficient inference. Central to this approach is the
+representation of a spatially continuous Gaussian random field as the
+solution of a stochastic partial differential equation (SPDE) defined
+over a triangular mesh spanning the spatial domain. The mesh definition
+is an important part of the model implementation. Equally crucial, yet
+often overlooked, is the role of integration points employed in
+numerically solving the stochastic integral inherent in the LGCP
+likelihood.</p>
 <div id="objectives" class="section level2">
 <h2>Objectives</h2>
 <ol style="list-style-type: decimal">
@@ -825,13 +841,21 @@ setosa
 </tbody>
 </table>
 </div>
+<div id="conclusions" class="section level1">
+<h1>Conclusions</h1>
+<p>Using both simulations and real-world ecological data, we illustrate
+these challenges and offer guidelines to empower users in navigating
+these complexities and mitigating potential pitfalls when using these
+methods in ecological applications such as species distribution models
+based on presence-only data.</p>
+</div>
 <div id="references" class="section level1">
 <h1>References</h1>
 </div>
 
 </div>
 <div class="main">
-<p><strong>Innacurate covariates resolution within INLA/SPDE mesh definition lead to unreliable numerical integration and biased parameter estimates</strong>.</p>
+<p><strong>Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates</strong></p>
 </div>
 <div class="main_bottom">
 <img id="main-img-left" src=https://raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png>

@@ -1,29 +1,48 @@
 ---
 main_topsize: 0.2 #percent coverage of the poster
 main_bottomsize: 0.1
-title: '**Spatial Point Processes modelling with INLA: are finer covariate resolutions always better?**'
+title: '**Spatial Point Processes with INLA: are finer covariate resolutions always better?**'
 author:
-  - name: '**Gandalf the Grey**'
+  - name: Sara Martino
     affil: 1
     main: true
-    orcid: '0000-0002-1825-0097'
-    twitter: IHEID
-    email: example@example.ch
-  - name: Frodo Baggins
+    email: 'sara.martino@ntnu.no'
+  - name: Leonardo Capitani
     affil: 2
     main: true
-    email: 'ag.con@iheiddown.net'
-  - name: Bilbo
+    email: 'leocapi07@gmail.com'
+  - name: Virginia Morera-Pujol
     affil: 3
+    main: true
+    email: 'morera.virginia@gmail.com'
+  - name: Erin Bryce
+    affil: 4
+    main: true
+    email: ''
+  - name: Jafet Belmont
+    affil: 5
+    main: true
+    email: ''
+  - name: Megan Morton
+    affil: 6
+    main: true
+    email: ''
+  - name: Janine Illian 
+    affil: 7
+    main: true
+    email: ''
+    
 affiliation:
   - num: 1
-    address: Department of International Ring Study, Central University of Middle Earth
+    address: Department of Mathematical Sciences, Norwegian University of Science and Technology
   - num: 2
-    address: Department of Dragon Studies, Northern University of Middle Earth
+    address: Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland
   - num: 3
-    address:  Department of Wraith-World Studies, Eastern University of Middle Earth
+    address: Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
+
 main_findings:
-  - "**Innacurate covariates resolution within INLA/SPDE mesh definition lead to unreliable numerical integration and biased parameter estimates**."
+  - "**Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates**"
+  
 logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logocenter_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
@@ -52,26 +71,23 @@ options(knitr.table.format = "html")
 
 # Introduction
 
-This is the `iheiddown_betterport` template for the `{iheiddown}`
-[@iheiddown] package! Based on the great `{posterdown}` package, it
-provides the user with an IHEID version of the template by default. The
-original `{posterdown}` template was inspired by the twitter thread of
-[Mike
-Morrison](https://mobile.twitter.com/mikemorrison/status/1110191245035479041).Please
-check also this [wiki
-page](https://github.com/brentthorne/posterdown/wiki/posterdown_betterport)
-with another similar package: Posterdown [@posterdown].
+<!--# Author's order: Which is the author's order on the abstract? Please Virginia take care of this as you have it on your laptop.-->
 
-```{r, include=FALSE}
-# Writing the bibliography of the packages you're using to create the current
-# poster is a great way to give credit to the authors of the packages you're
-# using.
-knitr::write_bib(c('iheiddown',
-                   'rmarkdown',
-                   'posterdown',
-                   'iheiddown'),
-                 'packages.bib')
-```
+In ecology, spatial point processes (SPP) have become a popular
+statistical tool to model presence only data, both on their own, and as
+a building block for model complex models (i.e. integrated species
+distribution models). However, inference on SPP, particularly when
+incorporating spatially explicit random effects, poses significant
+complexity. A common strategy involves adopting the so-called
+log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
+implementation for efficient inference. Central to this approach is the
+representation of a spatially continuous Gaussian random field as the
+solution of a stochastic partial differential equation (SPDE) defined
+over a triangular mesh spanning the spatial domain. The mesh definition
+is an important part of the model implementation. Equally crucial, yet
+often overlooked, is the role of integration points employed in
+numerically solving the stochastic integral inherent in the LGCP
+likelihood.
 
 ## Objectives
 
@@ -147,5 +163,13 @@ knitr::kable(
                              "Species"),
   escape = FALSE)
 ```
+
+# Conclusions
+
+Using both simulations and real-world ecological data, we illustrate
+these challenges and offer guidelines to empower users in navigating
+these complexities and mitigating potential pitfalls when using these
+methods in ecological applications such as species distribution models
+based on presence-only data.
 
 # References
