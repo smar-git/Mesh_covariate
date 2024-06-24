@@ -8,7 +8,7 @@
 
 
 
-<title>A Better Reproducible Poster Title</title>
+<title>Spatial Point Processes with INLA: are finer covariate resolutions always better?</title>
 
 
 
@@ -450,39 +450,55 @@ span > #tab:mytable {
 
 <div class="column outer">
 <div class="section">
-<h1 id="title"><strong>A Better Reproducible Poster Title</strong></h1><br>
+<h1 id="title"><strong>Spatial Point Processes with INLA: are finer covariate resolutions always better?</strong></h1><br>
 <h3 id="author" class="author">
 
-<strong>Gandalf the Grey</strong><sup> 1, <a class="orcid" href="https://orcid.org/0000-0002-1825-0097"><img src="https://raw.githubusercontent.com/brentthorne/posterdown/master/images/orcid.jpg"></a></sup><br>
-<a class="twitter" href="https://mobile.twitter.com/IHEID"><i class="fab fa-twitter"></i>&nbsp;&nbsp;@IHEID</a><br>
+Sara Martino<sup> 1</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:example@example.ch" class="email">example@example.ch</a> <br>
- Frodo Baggins<sup> 2</sup><br>
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:sara.martino@ntnu.no" class="email">sara.martino@ntnu.no</a> <br>
+ Leonardo Capitani<sup> 2</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:ag.con@iheiddown.net" class="email">ag.con@iheiddown.net</a> <br>
- </h3>
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:leocapi07@gmail.com" class="email">leocapi07@gmail.com</a> <br>
+ Virginia Morera-Pujol<sup> 3</sup><br>
+
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:morera.virginia@gmail.com" class="email">morera.virginia@gmail.com</a> <br>
+ Erin Bryce<sup> 4</sup><br>
+
+ Jafet Belmont<sup> 5</sup><br>
+
+ Megan Morton<sup> 6</sup><br>
+
+ Janine Illian<sup> 7</sup><br>
+
+</h3>
 
 <h5 id="author_extra", class="author_extra">
-  Bilbo<sup>3</sup>
-</h5>
+      </h5>
 
 
 <p id="affiliation" class="affiliation">
-<sup>1</sup> Department of International Ring Study, Central University of Middle Earth<br> <sup>2</sup> Department of Dragon Studies, Northern University of Middle Earth<br> <sup>3</sup> Department of Wraith-World Studies, Eastern University of Middle Earth
+<sup>1</sup> Department of Mathematical Sciences, Norwegian University of Science and Technology<br> <sup>2</sup> Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland<br> <sup>3</sup> Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
 </p>
 </div>
 
 <div id="introduction" class="section level1">
 <h1>Introduction</h1>
-<p>This is the <code>iheiddown_betterport</code> template for the <code>{iheiddown}</code>
-<span class="citation">(<a href="#ref-iheiddown">Hollway 2022</a>)</span> package! Based on the great <code>{posterdown}</code> package, it
-provides the user with an IHEID version of the template by default. The
-original <code>{posterdown}</code> template was inspired by the twitter thread of
-<a href="https://mobile.twitter.com/mikemorrison/status/1110191245035479041">Mike
-Morrison</a>.Pleaase
-check also this <a href="https://github.com/brentthorne/posterdown/wiki/posterdown_betterport">wiki
-page</a>
-with another similar package: Posterdown <span class="citation">(<a href="#ref-posterdown">Thorne 2019</a>)</span>.</p>
+<!--# Author's order: Which is the author's order on the abstract? Please Virginia take care of this as you have it on your laptop.-->
+<p>In ecology, spatial point processes (SPP) have become a popular
+statistical tool to model presence only data, both on their own, and as
+a building block for model complex models (i.e. integrated species
+distribution models). However, inference on SPP, particularly when
+incorporating spatially explicit random effects, poses significant
+complexity. A common strategy involves adopting the so-called
+log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
+implementation for efficient inference. Central to this approach is the
+representation of a spatially continuous Gaussian random field as the
+solution of a stochastic partial differential equation (SPDE) defined
+over a triangular mesh spanning the spatial domain. The mesh definition
+is an important part of the model implementation. Equally crucial, yet
+often overlooked, is the role of integration points employed in
+numerically solving the stochastic integral inherent in the LGCP
+likelihood.</p>
 <div id="objectives" class="section level2">
 <h2>Objectives</h2>
 <ol style="list-style-type: decimal">
@@ -504,9 +520,9 @@ E = mc^2
 <p>To reference a citation you can add your <code>.bib</code> file to the working
 directory and name it in the YAML metadata or generate an automated one
 as done here, then you only need to reference the label value in the
-<code>.bib</code> file <span class="citation">(<a href="#ref-dambly2023">Dambly et al. 2023</a>)</span>. For example this package is built on top of
+<code>.bib</code> file <span class="citation">(<a href="#ref-dambly2023"><strong>dambly2023?</strong></a>)</span>. For example this package is built on top of
 the wonderful {pagedown} package and I will cite it at the end of this
-sentence using this in the rmd <span class="citation">(<a href="#ref-pagedown">Xie et al. 2022</a>)</span>.</p>
+sentence using this in the rmd <span class="citation">(<a href="#ref-pagedown"><strong>pagedown?</strong></a>)</span>.</p>
 <p>To get a better understanding of how to include features like these
 please refer to the {iheiddown}
 <a href="https://github.com/iheiddown/wiki">wiki</a>.</p>
@@ -825,27 +841,21 @@ setosa
 </tbody>
 </table>
 </div>
-<div id="references" class="section level1 unnumbered">
+<div id="conclusions" class="section level1">
+<h1>Conclusions</h1>
+<p>Using both simulations and real-world ecological data, we illustrate
+these challenges and offer guidelines to empower users in navigating
+these complexities and mitigating potential pitfalls when using these
+methods in ecological applications such as species distribution models
+based on presence-only data.</p>
+</div>
+<div id="references" class="section level1">
 <h1>References</h1>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-dambly2023" class="csl-entry">
-Dambly, Lea I., Nick J. B. Isaac, Kate E. Jones, Katherine L. Boughey, and Robert B. O’Hara. 2023. <span>“Integrated Species Distribution Models Fitted in INLA Are Sensitive to Mesh Parameterisation.”</span> <em>Ecography</em> 2023 (7). <a href="https://doi.org/10.1111/ecog.06391">https://doi.org/10.1111/ecog.06391</a>.
-</div>
-<div id="ref-iheiddown" class="csl-entry">
-Hollway, James. 2022. <span>“Iheiddown: For Writing Geneva Graduate Institute Documents.”</span> <a href="https://CRAN.R-project.org/package=iheiddown">https://CRAN.R-project.org/package=iheiddown</a>.
-</div>
-<div id="ref-posterdown" class="csl-entry">
-Thorne, W. Brent. 2019. <span>“Posterdown: An r Package Built to Generate Reproducible Conference Posters for the Academic and Professional World Where Powerpoint and Pages Just Won’t Cut It.”</span> <a href="https://github.com/brentthorne/posterdown">https://github.com/brentthorne/posterdown</a>.
-</div>
-<div id="ref-pagedown" class="csl-entry">
-Xie, Yihui, Romain Lesur, Brent Thorne, and Xianying Tan. 2022. <span>“Pagedown: Paginate the HTML Output of r Markdown with CSS for Print.”</span> <a href="https://CRAN.R-project.org/package=pagedown">https://CRAN.R-project.org/package=pagedown</a>.
-</div>
-</div>
 </div>
 
 </div>
 <div class="main">
-<p>Make <strong>better posters</strong> with RMarkdown + <strong>{iheiddown}</strong>.</p>
+<p><strong>Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates</strong></p>
 </div>
 <div class="main_bottom">
 <img id="main-img-left" src=https://raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png>
