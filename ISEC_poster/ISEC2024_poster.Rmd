@@ -1,7 +1,7 @@
 ---
 main_topsize: 0.2 #percent coverage of the poster
 main_bottomsize: 0.1
-title: '**Spatial Point Processes modelling with INLA/SPDE: are finer covariate resolutions always better?**'
+title: '**Spatial Point Processes modelling with INLA: are finer covariate resolutions always better?**'
 author:
   - name: '**Gandalf the Grey**'
     affil: 1
@@ -23,7 +23,7 @@ affiliation:
   - num: 3
     address:  Department of Wraith-World Studies, Eastern University of Middle Earth
 main_findings:
-  - "**Inadequate model covariate resolution relative to that of the mesh can lead to highly unreliable numerical integration**."
+  - "**Innacurate covariates resolution within INLA/SPDE mesh definition lead to unreliable numerical integration and biased parameter estimates**."
 logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logocenter_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
