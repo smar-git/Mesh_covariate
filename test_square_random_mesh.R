@@ -8,6 +8,23 @@
 #' We then estimate the model using different meshes, all meshes have 
 #' similar parameters but different locations for the mesh nodes.
 
+
+#' build the mesh with points instead of shape, use a lattice input to build the mesh
+#' 
+#' check correlation range of the covariate and the size of the mesh, ratio between correlation of covariate
+#' and mesh length
+#' 
+#' in slide 24 have both size and color depend on weights
+#' scale_size_area
+#' 
+#' 
+#' slide 31 flip int scheme and spde scheme
+#' 
+#' dual mesh (voronii cells) and integration cells
+#' 
+#' paper guy from oslo taht looks at the mesh
+
+
 #+ echo = FALSE
 knitr::opts_chunk$set(collapse = TRUE, echo = FALSE,
                       message = FALSE, warning = FALSE,
@@ -26,7 +43,7 @@ library(scico)
 library(terra)
 rm(list = ls())
 source("book_mesh_dual.R")
-set.seed(123)
+set.seed(1234)
 
 plot_save_dir  = "presentation/plots/random_mesh/"
 theme_maps = list(theme(axis.title.x=element_blank(),
@@ -59,28 +76,28 @@ poly <- data.frame(x = box[c(1,3)], y = box[c(2,4)]) %>%
   st_bbox() %>% 
   st_as_sfc()
 
-polys = list()
-polys[[1]] = poly
-polys[[2]]  = data.frame(x = box[c(1,3)]-5, y = box[c(2,4)]+10) %>% 
-  st_as_sf(coords = c("x", "y")) %>% 
-  st_bbox() %>% 
-  st_as_sfc()
-polys[[3]]  = data.frame(x = box[c(1,3)]+10, y = box[c(2,4)]+10) %>% 
-  st_as_sf(coords = c("x", "y")) %>% 
-  st_bbox() %>% 
-  st_as_sfc()
-polys[[4]]  = data.frame(x = box[c(1,3)]+20, y = box[c(2,4)]-20) %>% 
-  st_as_sf(coords = c("x", "y")) %>% 
-  st_bbox() %>% 
-  st_as_sfc()
-polys[[5]]  = data.frame(x = box[c(1,3)]+7, y = box[c(2,4)]+10) %>% 
-  st_as_sf(coords = c("x", "y")) %>% 
-  st_bbox() %>% 
-  st_as_sfc()
-polys[[6]]  = data.frame(x = box[c(1,3)]-20, y = box[c(2,4)]+0) %>% 
-  st_as_sf(coords = c("x", "y")) %>% 
-  st_bbox() %>% 
-  st_as_sfc()
+# polys = list()
+# polys[[1]] = poly
+# polys[[2]]  = data.frame(x = box[c(1,3)]-5, y = box[c(2,4)]+10) %>% 
+#   st_as_sf(coords = c("x", "y")) %>% 
+#   st_bbox() %>% 
+#   st_as_sfc()
+# polys[[3]]  = data.frame(x = box[c(1,3)]+10, y = box[c(2,4)]+10) %>% 
+#   st_as_sf(coords = c("x", "y")) %>% 
+#   st_bbox() %>% 
+#   st_as_sfc()
+# polys[[4]]  = data.frame(x = box[c(1,3)]+20, y = box[c(2,4)]-20) %>% 
+#   st_as_sf(coords = c("x", "y")) %>% 
+#   st_bbox() %>% 
+#   st_as_sfc()
+# polys[[5]]  = data.frame(x = box[c(1,3)]+7, y = box[c(2,4)]+10) %>% 
+#   st_as_sf(coords = c("x", "y")) %>% 
+#   st_bbox() %>% 
+#   st_as_sfc()
+# polys[[6]]  = data.frame(x = box[c(1,3)]-20, y = box[c(2,4)]+0) %>% 
+#   st_as_sf(coords = c("x", "y")) %>% 
+#   st_bbox() %>% 
+#   st_as_sfc()
 
 cov1 <- rast(nrows = max_dom/res, ncols=max_dom/res, xmin=0, xmax=max_dom, ymin = 0, ymax = max_dom)
 cov2 <- rast(nrows = max_dom/res, ncols=max_dom/res, xmin=0, xmax=max_dom, ymin = 0, ymax = max_dom)
@@ -90,35 +107,51 @@ cov3 <- rast(nrows = max_dom/res, ncols=max_dom/res, xmin=0, xmax=max_dom, ymin 
 
 n_meshes = 6
 
+xy0 = expand.grid(seq(-100,600,50),
+                 seq(-100,600,50))
 
 
 ## create meshes and int points -----------------------------------------------------------
+#meshes = list()
+
+#for(i in 1:n_meshes)
+#    meshes[[i]] =  fm_mesh_2d_inla(boundary = polys[[i]],
+#                               max.edge = c(75,80))
+
+
 meshes = list()
-
+cc = cbind(c(0,20, 10, 0,-20,-20),
+           c(0,20, -10, 30,0,-10))
 for(i in 1:n_meshes)
-    meshes[[i]] =  fm_mesh_2d_inla(boundary = polys[[i]],
-                               max.edge = c(75,80))
-
-
-
+{
+  xy = xy0
+  xy[,1] = xy[,1]+cc[i,1]
+  xy[,2] = xy[,2]+cc[i,2]
+  
+    meshes[[i]] =  fm_mesh_2d_inla(loc = xy)
+}
 
 ggplot() + gg(meshes[[1]]) +  geom_sf(data = poly, alpha = 0, color = "red") +
-  coord_sf(xlim = c(-100,600), ylim = c(-100,600)) + ggtitle("Mesh 1") +
+  coord_sf(xlim = c(-150,650), 
+           ylim = c(-150,650)
+    ) + 
+  ggtitle("Mesh 1") +
   xlab("") + ylab("") + theme_maps +
-ggplot() + gg(meshes[[2]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
-  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 2") +
+ggplot() + gg(meshes[[2]]) +  geom_sf(data = poly, alpha = 0, 
+                                      color = "red", size = 2)+
+  coord_sf(xlim = c(-150,650), ylim = c(-150,650))+ ggtitle("Mesh 2") +
   xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[3]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
-  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 3") +
+  coord_sf(xlim = c(-150,650), ylim = c(-150,650))+ ggtitle("Mesh 3") +
   xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[4]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
-  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 4") +
+  coord_sf(xlim = c(-150,650), ylim = c(-150,650))+ ggtitle("Mesh 4") +
   xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
-  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 5") +
+  coord_sf(xlim = c(-150,650), ylim = c(-150,650))+ ggtitle("Mesh 5") +
   xlab("") + ylab("") +theme_maps +
 ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
-  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
+  coord_sf(xlim = c(-150,650), ylim = c(-150,650))+ ggtitle("Mesh 6") +
   xlab("") + ylab("")+  theme_maps 
 
  ggsave(paste(plot_save_dir,"meshes.png", sep = ""))
@@ -148,10 +181,10 @@ sim_matern <- inla.spde2.pcmatern(sim_mesh,
 A = inla.spde.make.A(mesh = sim_mesh, loc  = crds(cov1))
 
 
-range = 10
-sigma = 1
+range1 = 10
+sigma1 = 1
 Q <- inla.spde2.precision(spde = sim_matern,
-                          theta = c(log(range),log(sigma)))
+                          theta = c(log(range1),log(sigma1)))
 samp1 <- inla.qsample(n = 2,
                      Q = Q,
                      mu = rep(0,dim(Q)[1]))
@@ -164,10 +197,10 @@ names(cov1) =  "val"
 #  gg(meshes[[1]])
 
 
-range = 50
-sigma = 1
+range2 = 50
+sigma2 = 1
 Q <- inla.spde2.precision(spde = sim_matern,
-                          theta = c(log(range),log(sigma)))
+                          theta = c(log(range2),log(sigma2)))
 samp2 <- inla.qsample(n = 2,
                       Q = Q,
                       mu = rep(0,dim(Q)[1]))
@@ -179,10 +212,10 @@ names(cov2) =  "val"
 #  gg(meshes[[1]]) + coord_equal()
 
 
-range = 600
-sigma = 1
+range3 = 600
+sigma3 = 1
 Q <- inla.spde2.precision(spde = sim_matern,
-                          theta = c(log(range),log(sigma)))
+                          theta = c(log(range3),log(sigma3)))
 samp3 <- inla.qsample(n = 2,
                      Q = Q,
                      mu = rep(0,dim(Q)[1]))
@@ -192,11 +225,17 @@ names(cov3) =  "val"
 
 
 
-ggplot() + geom_spatraster(data = cov1) + theme_maps + theme(legend.position  = "none") +
+ggplot() + geom_spatraster(data = cov1) + geom_sf(data = poly,
+                                                  alpha = 0) +
+  theme_maps + theme(legend.position  = "none") +
   ggtitle("Covariate 1") + 
-  ggplot() + geom_spatraster(data = cov2) + theme_maps + theme(legend.position   = "none") +
+  ggplot() + geom_spatraster(data = cov2) + geom_sf(data = poly,
+                                                    alpha = 0) +
+  theme_maps + theme(legend.position   = "none") +
   ggtitle("Covariate 2") + 
-  ggplot() + geom_spatraster(data = cov3) + theme_maps + theme(legend.position   = "none") +
+  ggplot() + geom_spatraster(data = cov3) + geom_sf(data = poly,
+                                                    alpha = 0) +
+  theme_maps + theme(legend.position   = "none") +
   ggtitle("Covariate 3") + plot_layout(ncol = 2)
 ggsave(paste(plot_save_dir,"covariates.png",sep =""))
   
@@ -260,6 +299,27 @@ data.frame(mesh = paste("mesh",1:6,sep = ""),
   ggplot() + geom_line(aes(mesh, value, group = name, color = name))
 
 ggsave(paste(plot_save_dir, "integrated_cov.png",sep = ""))
+
+
+p2 = rbind(cbind(dual[[1]], mesh = "Mesh 1"),
+      cbind(dual[[2]], mesh = "Mesh 2"),
+      cbind(dual[[3]], mesh = "Mesh 3"),
+      cbind(dual[[4]], mesh = "Mesh 4"),
+      cbind(dual[[5]], mesh = "Mesh 5"),
+      cbind(dual[[6]], mesh = "Mesh 6")) %>%
+  pivot_longer(-c(geometry, mesh)) %>%
+  ggplot() + geom_sf(aes(fill = value)) +
+  facet_grid(name~mesh) + theme_maps
+
+p1 = ggplot() + geom_spatraster(data = cov1)+ theme_maps +
+  coord_equal() + ggtitle("Cov1") +
+ggplot() + geom_spatraster(data = cov2)+ theme_maps +
+  coord_equal() + ggtitle("Cov2") +
+ggplot() + geom_spatraster(data = cov3)+ theme_maps +
+  coord_equal() + ggtitle("Cov3") + plot_layout(ncol = 3)
+
+p1
+p2
 
 
 ints = rbind(int[[1]], int[[2]], int[[3]], int[[4]], int[[5]], int[[6]])
@@ -469,3 +529,11 @@ rbind(aa1, aa2,aa3 ) %>%
 ggsave(paste(plot_save_dir,"results.png",sep =""))
 
   
+min_dist = numeric(n_meshes)
+for(i in 1:n_meshes)
+  min_dist[i] = min(as.vector(dist(meshes[[1]]$loc[,-3])))
+
+range1/min_dist
+range2/min_dist
+range3/min_dist
+

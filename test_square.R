@@ -22,7 +22,7 @@ library(scico)
 library(terra)
 rm(list = ls())
 
-set.seed(124545)
+set.seed(12455)
 plot_save_dir  = "presentation/plots/test_mesh/"
 
 
@@ -62,10 +62,18 @@ meshes[[1]] =  fm_mesh_2d_inla(boundary = poly,
                                max.edge = c(95,100))
 
 
+
+
 ggplot() + gg(meshes[[1]]) + coord_equal()
 n_meshes = 5
 for(i in 2:n_meshes)
   meshes[[i]] = fmesher:::fm_subdivide(meshes[[i-1]])
+
+length_edge = numeric(n_meshes)
+  length_edge[1] = max(as.matrix(dist(meshes[[1]]$loc[,-3], ))[which(meshes[[1]]$graph$vv==1)])
+for(i in 2:n_meshes)
+  length_edge[i] = length_edge[i-1]/2  
+
 
 
 sapply(meshes, function(x)x$n) %>% plot()
@@ -91,10 +99,10 @@ sim_matern <- inla.spde2.pcmatern(sim_mesh,
 A = inla.spde.make.A(mesh = sim_mesh, loc  = crds(cov1))
 
 
-range = 8
-sigma = 1
+range1 = 8
+sigma1 = 1
 Q <- inla.spde2.precision(spde = sim_matern,
-                          theta = c(log(range),log(sigma)))
+                          theta = c(log(range1),log(sigma1)))
 samp1 <- inla.qsample(n = 2,
                      Q = Q,
                      mu = rep(0,dim(Q)[1]))
@@ -107,10 +115,10 @@ ggplot() + geom_spatraster(data = cov1) + scale_fill_scico( direction = -1) +
   gg(meshes[[1]])+ coord_equal()
 
 
-range = 40
-sigma = 1
+range2 = 40
+sigma2 = 1
 Q <- inla.spde2.precision(spde = sim_matern,
-                          theta = c(log(range),log(sigma)))
+                          theta = c(log(range2),log(sigma2)))
 samp2 <- inla.qsample(n = 2,
                       Q = Q,
                       mu = rep(0,dim(Q)[1]))
@@ -122,10 +130,10 @@ ggplot() + geom_spatraster(data = cov2) + scale_fill_scico( direction = -1) +
   gg(meshes[[1]]) + coord_equal()
 
 
-range = 600
-sigma = 1
+range3 = 100
+sigma3 = 1
 Q <- inla.spde2.precision(spde = sim_matern,
-                          theta = c(log(range),log(sigma)))
+                          theta = c(log(range3),log(sigma3)))
 samp3 <- inla.qsample(n = 2,
                      Q = Q,
                      mu = rep(0,dim(Q)[1]))
@@ -135,6 +143,12 @@ names(cov3) =  "val"
 
 ggplot() + geom_spatraster(data = cov3) + scale_fill_scico( direction = -1) +
   gg(meshes[[1]])+ coord_equal()
+
+
+
+plot(range1/length_edge)
+plot(range2/length_edge)
+plot(range3/length_edge)
 
 # simulate a point process ------------------------------------------------
 
@@ -160,7 +174,7 @@ simulate_PP = function(loglambda)
 int1 = -6.5
 int2 = -6.5
 int3 = -6.5
-beta = -1
+beta = -1.2
 
 loglambda1 = int1 + beta * cov1
 loglambda2 = int2 + beta * cov2
@@ -333,4 +347,8 @@ rbind(aa1, aa2, aa3 ) %>%
   geom_vline(aes(xintercept = true), linetype = "dashed") + 
   facet_grid(cov~ ., scales = "free") +
   ggtitle("covariate")
+
+range1/length_edge
+range2/length_edge
+range3/length_edge
 

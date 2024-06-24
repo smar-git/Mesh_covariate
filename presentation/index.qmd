@@ -4,9 +4,10 @@ subtitle: ""
 author: Sara Martino (++)
 format:
   revealjs: 
+    self-contained: true
     slide-number: true
-    chalkboard: 
-      buttons: false
+    #chalkboard: 
+    #  buttons: false
     preview-links: auto
 #    logo: images/quarto.png
 #    css: styles.css
@@ -98,7 +99,7 @@ The results: Predicted intensity
 `![](figures/pred_intensity.png){.absolute top="170" left="30" width="1000" height="500"}
 
 
-## Are things really so bad?
+<!-- ## Are things really so bad? -->
 
 
 
