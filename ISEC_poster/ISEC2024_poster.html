@@ -200,7 +200,7 @@ padding: 0px;
 }
 .outer {
 width: 36in;
-height: calc(48in *  (1 - 0.15 - 5.0e-2 - 0.01) );
+height: calc(48in *  (1 - 0.2 - 1.0e-2 - 0.01) );
 -webkit-column-count: 3; /* Chrome, Safari, Opera */
 -moz-column-count: 3; /* Firefox */
 column-count: 3;
@@ -221,7 +221,7 @@ column-rule-style: none;
 column-rule-color: black;
 background-color: #ffffff;
 font-family: Rasa;
-margin-top: calc(48in *  0.15 );
+margin-top: calc(48in *  0.2 );
 padding-top: 1em;
 padding-bottom: 1em;
 }
@@ -314,7 +314,7 @@ text-align: left;
 }
 .main {
 width: 36in;
-height: calc(48in * 0.15);
+height: calc(48in * 0.2);
 position: absolute;
 background-color: #ed2215;
 color: #ffffff90;
@@ -395,8 +395,8 @@ padding: 0cm;
 }
 .main_bottom {
 width: 36in;
-height: calc(48in * 5.0e-2);
-margin-top: calc(48in * (1 - 5.0e-2));
+height: calc(48in * 1.0e-2);
+margin-top: calc(48in * (1 - 1.0e-2));
 position: absolute;
 background-color: #ed2215;
 background-image: linear-gradient(#800000 10%, #ed2215);
@@ -455,25 +455,18 @@ span > #tab:mytable {
 
 Sara Martino<sup> 1</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:sara.martino@ntnu.no" class="email">sara.martino@ntnu.no</a> <br>
  Jafet Belmont<sup> 2</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Jafet.BelmontOsuna@glasgow.ac.uk" class="email">Jafet.BelmontOsuna@glasgow.ac.uk</a> <br>
  Erin Bryce<sup> 2</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Erin.Bryce@glasgow.ac.uk" class="email">Erin.Bryce@glasgow.ac.uk</a> <br>
  Leonardo Capitani<sup> 3</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:leocapi07@gmail.com" class="email">leocapi07@gmail.com</a> <br>
  Virginia Morera-Pujol<sup> 4</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:morera.virginia@gmail.com" class="email">morera.virginia@gmail.com</a> <br>
  Megan Morton<sup> 2</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Megan.Laxton@glasgow.ac.uk" class="email">Megan.Laxton@glasgow.ac.uk</a> <br>
  Janine Illian<sup> 2</sup><br>
 
-<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Janine.Illian@glasgow.ac.uk" class="email">Janine.Illian@glasgow.ac.uk</a> <br>
 </h3>
 
 <h5 id="author_extra", class="author_extra">
@@ -481,7 +474,7 @@ Sara Martino<sup> 1</sup><br>
 
 
 <p id="affiliation" class="affiliation">
-<sup>1</sup> Department of Mathematical Sciences, Norwegian University of Science and Technology<br> <sup>2</sup> School of Mathematics and Statistics, University of Glasgow<br> <sup>3</sup> Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland<br> <sup>4</sup> Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
+<sup>1</sup> Department of Mathematical Sciences, Norwegian University of Science and Technology<br> <sup>2</sup> School of Mathematics and Statistics, University of Glasgow<br> <sup>3</sup> Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland<br> <sup>4</sup> School of Biology and Environmental Science, University College Dublin
 </p>
 </div>
 
@@ -509,27 +502,34 @@ likelihood.</p>
 Figure 1: In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable
 </p>
 </div>
+<!-- Main problem: I'd love to make this figure a bit bigger, like have the plot as wide as the column of text. Do you know how to do that?  -->
 </div>
-<div id="methods" class="section level1">
-<h1>Methods</h1>
-<p>I will show here how to include poster elements that may be useful, such
-as an equation using mathjax:</p>
-<p><span class="math display">\[
-E = mc^2
-\]</span></p>
-<p>To reference a citation you can add your <code>.bib</code> file to the working
-directory and name it in the YAML metadata or generate an automated one
-as done here, then you only need to reference the label value in the
-<code>.bib</code> file <span class="citation">(<a href="#ref-dambly2023"><strong>dambly2023?</strong></a>)</span>. For example this package is built on top of
-the wonderful {pagedown} package and I will cite it at the end of this
-sentence using this in the rmd <span class="citation">(<a href="#ref-pagedown"><strong>pagedown?</strong></a>)</span>.</p>
-<p>To get a better understanding of how to include features like these
-please refer to the {iheiddown}
-<a href="https://github.com/iheiddown/wiki">wiki</a>.</p>
-<p><strong><em>Now on to the results!</em></strong></p>
+<div id="an-example" class="section level1">
+<h1>An example</h1>
+<p>Let’s picture three covariates with very different ranges:</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:covars"></span>
+<img src="ISEC2024_poster_files/figure-html/covars-1.png" alt="Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600" width="90%" />
+<p class="caption">
+Figure 2: Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600
+</p>
 </div>
-<div id="results" class="section level1">
-<h1>Results</h1>
+<p>Now, let’s fit a SPP model to those covariates with 6 slightly varying meshes. The only variation is that the domain of the mesh is slightly shifted in space for each of them. This will cause slightly shifted integration points for each, as these points are located at the vertices of the mesh triangles.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:meshes"></span>
+<img src="ISEC2024_poster_files/figure-html/meshes-1.png" alt="This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too." width="90%" />
+<p class="caption">
+Figure 3: This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.
+</p>
+</div>
+<p>After fitting one model with each mesh to the same point pattern, we can see how the coefficients vary much more for the covariate with the shortest range (Covariate 1), whereas the coefficients for the covariate with the longest range (Covariate 3) are much more stable</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:coefficients"></span>
+<img src="ISEC2024_poster_files/figure-html/coefficients-1.png" alt="This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too." width="90%" />
+<p class="caption">
+Figure 4: This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.
+</p>
+</div>
+</div>
+<div id="a-real-world-example" class="section level1">
+<h1>A real world example</h1>
 <p>Here you may have some figures to show off, bellow I have made a
 scatterplot with the infamous Iris dataset and I can even reference to
 the figure automatically like this, <code>Figure \@ref(fig:irisfigure)</code>,
@@ -537,7 +537,7 @@ Figure <a href="#fig:irisfigure"><strong>??</strong></a>.</p>
 <p>Maybe you want to show off some of that fancy code you spent so much
 time on to make that figure, well you can do that too! Just use the
 <code>echo=TRUE</code> option in the r code chunk options, Figure
-<a href="#fig:myprettycode">2</a>!</p>
+<a href="#fig:myprettycode">5</a>!</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="co">#trim whitespace</span></span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar=</span><span class="fu">c</span>(<span class="dv">2</span>,<span class="dv">2</span>,<span class="dv">0</span>,<span class="dv">0</span>))</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co">#plot boxplots</span></span>
@@ -549,7 +549,7 @@ time on to make that figure, well you can do that too! Just use the
 <div class="figure" style="text-align: center"><span style="display:block;" id="fig:myprettycode"></span>
 <img src="ISEC2024_poster_files/figure-html/myprettycode-1.png" alt="Boxplots, so hot right now!" width="80%" />
 <p class="caption">
-Figure 2: Boxplots, so hot right now!
+Figure 5: Boxplots, so hot right now!
 </p>
 </div>
 <p>How about a neat table of data? See, Table <a href="#tab:iristable">1</a>:</p>
@@ -852,25 +852,12 @@ based on presence-only data.</p>
 <p>The model only <em>sees</em> the covariate values at the integration points. Therefore, <strong>the integration scheme and the covariates need to have similar resolution</strong></p>
 </div>
 <div class="main_bottom">
-<img id="main-img-left" src=https://raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png>
-<img id="main-img-center" src=https://raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png>
-<img id="main-img-right" src=https://raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png>
+<img id="main-img-left" src=>
+<img id="main-img-center" src=>
+<img id="main-img-right" src=>
 </div>
 </div>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-(function () {
-var script = document.createElement("script");
-script.type = "text/javascript";
-var src = "true";
-if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
-if (location.protocol !== "file:" && /^https?:/.test(src))
-src = src.replace(/^https?:/, '');
-script.src = src;
-document.getElementsByTagName("head")[0].appendChild(script);
-})();
-</script>
 
 
 </body>
