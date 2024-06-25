@@ -1,4 +1,3 @@
-
 #' Here we simulate three PP using  a LGCP where the log intensity
 #' depends on only an intercept and a covariate
 #' 
@@ -333,4 +332,3 @@ rbind(aa1, aa2, aa3 ) %>%
   geom_vline(aes(xintercept = true), linetype = "dashed") + 
   facet_grid(cov~ ., scales = "free") +
   ggtitle("covariate")
-

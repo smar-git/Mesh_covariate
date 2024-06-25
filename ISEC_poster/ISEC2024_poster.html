@@ -200,7 +200,7 @@ padding: 0px;
 }
 .outer {
 width: 36in;
-height: calc(48in *  (1 - 0.2 - 0.1 - 0.01) );
+height: calc(48in *  (1 - 0.15 - 5.0e-2 - 0.01) );
 -webkit-column-count: 3; /* Chrome, Safari, Opera */
 -moz-column-count: 3; /* Firefox */
 column-count: 3;
@@ -221,7 +221,7 @@ column-rule-style: none;
 column-rule-color: black;
 background-color: #ffffff;
 font-family: Rasa;
-margin-top: calc(48in *  0.2 );
+margin-top: calc(48in *  0.15 );
 padding-top: 1em;
 padding-bottom: 1em;
 }
@@ -314,7 +314,7 @@ text-align: left;
 }
 .main {
 width: 36in;
-height: calc(48in * 0.2);
+height: calc(48in * 0.15);
 position: absolute;
 background-color: #ed2215;
 color: #ffffff90;
@@ -395,8 +395,8 @@ padding: 0cm;
 }
 .main_bottom {
 width: 36in;
-height: calc(48in * 0.1);
-margin-top: calc(48in * (1 - 0.1));
+height: calc(48in * 5.0e-2);
+margin-top: calc(48in * (1 - 5.0e-2));
 position: absolute;
 background-color: #ed2215;
 background-image: linear-gradient(#800000 10%, #ed2215);
@@ -456,20 +456,24 @@ span > #tab:mytable {
 Sara Martino<sup> 1</sup><br>
 
 <a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:sara.martino@ntnu.no" class="email">sara.martino@ntnu.no</a> <br>
- Leonardo Capitani<sup> 2</sup><br>
+ Jafet Belmont<sup> 2</sup><br>
+
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Jafet.BelmontOsuna@glasgow.ac.uk" class="email">Jafet.BelmontOsuna@glasgow.ac.uk</a> <br>
+ Erin Bryce<sup> 2</sup><br>
+
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Erin.Bryce@glasgow.ac.uk" class="email">Erin.Bryce@glasgow.ac.uk</a> <br>
+ Leonardo Capitani<sup> 3</sup><br>
 
 <a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:leocapi07@gmail.com" class="email">leocapi07@gmail.com</a> <br>
- Virginia Morera-Pujol<sup> 3</sup><br>
+ Virginia Morera-Pujol<sup> 4</sup><br>
 
 <a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:morera.virginia@gmail.com" class="email">morera.virginia@gmail.com</a> <br>
- Erin Bryce<sup> 4</sup><br>
+ Megan Morton<sup> 2</sup><br>
 
- Jafet Belmont<sup> 5</sup><br>
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Megan.Laxton@glasgow.ac.uk" class="email">Megan.Laxton@glasgow.ac.uk</a> <br>
+ Janine Illian<sup> 2</sup><br>
 
- Megan Morton<sup> 6</sup><br>
-
- Janine Illian<sup> 7</sup><br>
-
+<a class='envelope'><i class="fas fa-envelope"></i></a> <a href="mailto:Janine.Illian@glasgow.ac.uk" class="email">Janine.Illian@glasgow.ac.uk</a> <br>
 </h3>
 
 <h5 id="author_extra", class="author_extra">
@@ -477,37 +481,33 @@ Sara Martino<sup> 1</sup><br>
 
 
 <p id="affiliation" class="affiliation">
-<sup>1</sup> Department of Mathematical Sciences, Norwegian University of Science and Technology<br> <sup>2</sup> Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland<br> <sup>3</sup> Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
+<sup>1</sup> Department of Mathematical Sciences, Norwegian University of Science and Technology<br> <sup>2</sup> School of Mathematics and Statistics, University of Glasgow<br> <sup>3</sup> Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland<br> <sup>4</sup> Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
 </p>
 </div>
 
-<div id="introduction" class="section level1">
-<h1>Introduction</h1>
-<!--# Author's order: Which is the author's order on the abstract? Please Virginia take care of this as you have it on your laptop.-->
+<!--# Author's order: I think we agreed Sara first and then alphabetical order and that's how's in the abstract so leaving it like that! -->
+<div id="rationale" class="section level1">
+<h1>Rationale</h1>
 <p>In ecology, spatial point processes (SPP) have become a popular
-statistical tool to model presence only data, both on their own, and as
-a building block for model complex models (i.e. integrated species
-distribution models). However, inference on SPP, particularly when
-incorporating spatially explicit random effects, poses significant
-complexity. A common strategy involves adopting the so-called
-log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
-implementation for efficient inference. Central to this approach is the
+statistical tool, and INLA/SPDE an efficient method to implement
+them and make efficient inference. Central to this approach is the
 representation of a spatially continuous Gaussian random field as the
 solution of a stochastic partial differential equation (SPDE) defined
-over a triangular mesh spanning the spatial domain. The mesh definition
+over a triangular mesh spanning the spatial domain. Although the mesh definition
 is an important part of the model implementation. Equally crucial, yet
 often overlooked, is the role of integration points employed in
 numerically solving the stochastic integral inherent in the LGCP
 likelihood.</p>
-<div id="objectives" class="section level2">
-<h2>Objectives</h2>
-<ol style="list-style-type: decimal">
-<li>Pick a template layout.</li>
-<li>Write/ create your poster content distraction free.</li>
-<li>Press <code>CTRL+K</code> and let <code>{iheiddown}</code> do its thing!</li>
-</ol>
-<p>Read the guide below (mostly identical to posterdown). It will make you
-familiar with the ways of creating a great poster.</p>
+<!-- Intro: I would love this to be a bit shorter and maybe a bit less technical, worth giving it some thought. Also need to make sure we convey the message that this is not SPDE/INLA's fault, and this intro is very inla/SPDE centric which I'm not sure conveys that. The word covariate is not even mentioned! The main message is that we need to chose covariates that act at a scale appropirate for the mesh/ipoints, not that the mesh and the ipoints can be thought of separately -->
+</div>
+<div id="main-problem" class="section level1">
+<h1>Main problem</h1>
+<p>When using the INLA/SPDE implementation, the model only <em>sees</em> the covariates at the integration points. Therefore, a covariate with a range much shorter than the distance between integration points will cause the model to provide unreliable inference.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:cropsfigure"></span>
+<img src="ISEC2024_poster_files/figure-html/cropsfigure-1.png" alt="In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable" width="90%" />
+<p class="caption">
+Figure 1: In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable
+</p>
 </div>
 </div>
 <div id="methods" class="section level1">
@@ -533,13 +533,7 @@ please refer to the {iheiddown}
 <p>Here you may have some figures to show off, bellow I have made a
 scatterplot with the infamous Iris dataset and I can even reference to
 the figure automatically like this, <code>Figure \@ref(fig:irisfigure)</code>,
-Figure <a href="#fig:irisfigure">1</a>.</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:irisfigure"></span>
-<img src="ISEC2024_poster_files/figure-html/irisfigure-1.png" alt="Here is a caption for the figure. This can be added by using the &quot;fig.cap&quot; option in the r code chunk options, see this [link](https://yihui.name/knitr/options/#plots) from the legend himself, [Yihui Xie](https://twitter.com/xieyihui)." width="80%" />
-<p class="caption">
-Figure 1: Here is a caption for the figure. This can be added by using the “fig.cap” option in the r code chunk options, see this <a href="https://yihui.name/knitr/options/#plots">link</a> from the legend himself, <a href="https://twitter.com/xieyihui">Yihui Xie</a>.
-</p>
-</div>
+Figure <a href="#fig:irisfigure"><strong>??</strong></a>.</p>
 <p>Maybe you want to show off some of that fancy code you spent so much
 time on to make that figure, well you can do that too! Just use the
 <code>echo=TRUE</code> option in the r code chunk options, Figure
@@ -855,7 +849,7 @@ based on presence-only data.</p>
 
 </div>
 <div class="main">
-<p><strong>Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates</strong></p>
+<p>The model only <em>sees</em> the covariate values at the integration points. Therefore, <strong>the integration scheme and the covariates need to have similar resolution</strong></p>
 </div>
 <div class="main_bottom">
 <img id="main-img-left" src=https://raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png>
