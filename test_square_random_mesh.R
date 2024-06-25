@@ -99,29 +99,30 @@ for(i in 1:n_meshes)
     meshes[[i]] =  fm_mesh_2d_inla(boundary = polys[[i]],
                                max.edge = c(75,80))
 
-
-
+saveRDS(meshes, file = "random_meshes.RDS")
+saveRDS(poly, file = "random_poly.RDS")
 
 ggplot() + gg(meshes[[1]]) +  geom_sf(data = poly, alpha = 0, color = "red") +
   coord_sf(xlim = c(-100,600), ylim = c(-100,600)) + ggtitle("Mesh 1") +
-  xlab("") + ylab("") + theme_maps +
+  xlab("") + ylab("") + theme_maps + theme_void() + 
 ggplot() + gg(meshes[[2]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 2") +
-  xlab("") + ylab("") +theme_maps +
+  xlab("") + ylab("") +theme_maps + theme_void() +
 ggplot() + gg(meshes[[3]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 3") +
-  xlab("") + ylab("") +theme_maps +
+  xlab("") + ylab("") +theme_maps + theme_void() +
 ggplot() + gg(meshes[[4]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 4") +
-  xlab("") + ylab("") +theme_maps +
+  xlab("") + ylab("") +theme_maps + theme_void() +
 ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 5") +
-  xlab("") + ylab("") +theme_maps +
+  xlab("") + ylab("") +theme_maps + theme_void() +
 ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
-  xlab("") + ylab("")+  theme_maps 
+  xlab("") + ylab("")+ theme_maps + theme_void() 
 
- ggsave(paste(plot_save_dir,"meshes.png", sep = ""))
+
+ggsave(paste(plot_save_dir,"meshes.png", sep = ""))
 
 
 sapply(meshes, function(x)x$n)
@@ -192,12 +193,29 @@ names(cov3) =  "val"
 
 
 
-ggplot() + geom_spatraster(data = cov1) + theme_maps + theme(legend.position  = "none") +
+ggplot() + geom_spatraster(data = cov1) + 
+  theme_maps + 
+  theme_bw() +
+  theme(legend.position  = "none") +
   ggtitle("Covariate 1") + 
-  ggplot() + geom_spatraster(data = cov2) + theme_maps + theme(legend.position   = "none") +
+  coord_equal() +
+  
+  ggplot() + geom_spatraster(data = cov2) + 
+  theme_maps + 
+  theme_bw() +
+  theme(legend.position   = "none") +
   ggtitle("Covariate 2") + 
-  ggplot() + geom_spatraster(data = cov3) + theme_maps + theme(legend.position   = "none") +
-  ggtitle("Covariate 3") + plot_layout(ncol = 2)
+  coord_equal() +
+  
+  ggplot() + geom_spatraster(data = cov3) + 
+  theme_maps + 
+  theme_bw() +
+  theme(legend.position   = "none") +
+  ggtitle("Covariate 3") + 
+  coord_equal() +
+  
+  plot_layout(ncol = 3)
+
 ggsave(paste(plot_save_dir,"covariates.png",sep =""))
   
 
@@ -220,9 +238,9 @@ for(i in 1:n_meshes)
 }
 
 mesh_nodes = st_as_sf(mesh_nodes, coords = c("x","y"))
-mesh_nodes$cov1 = extract(cov1, mesh_nodes)$val
-mesh_nodes$cov2 = extract(cov2, mesh_nodes)$val
-mesh_nodes$cov3 = extract(cov3, mesh_nodes)$val
+mesh_nodes$cov1 = terra::extract(cov1, mesh_nodes)$val
+mesh_nodes$cov2 = terra::extract(cov2, mesh_nodes)$val
+mesh_nodes$cov3 = terra::extract(cov3, mesh_nodes)$val
 
 
 mesh_nodes$cov1 =  bru_fill_missing(cov1, mesh_nodes, mesh_nodes$cov1)
@@ -230,12 +248,14 @@ mesh_nodes$cov2 =  bru_fill_missing(cov2, mesh_nodes, mesh_nodes$cov2)
 mesh_nodes$cov3 =  bru_fill_missing(cov3, mesh_nodes, mesh_nodes$cov3)
 
 head(mesh_nodes)
+
 dual = list()
 int = list()
 weights = c()
+
 for(i in 1:n_meshes)
 {
-  
+ # i = 1 
   dual[[i]] = st_as_sf(book.mesh.dual(meshes[[i]]))
   dual[[i]]$cov1 = mesh_nodes %>% filter(mesh==i) %>% pull(cov1)
   dual[[i]]$cov2 = mesh_nodes %>% filter(mesh==i) %>% pull(cov2)
@@ -270,6 +290,7 @@ ggplot() + geom_sf(data = mesh_nodes, aes(color = cov1)) + facet_wrap(.~mesh)  +
   geom_sf(data = poly, alpha = 0) + 
   geom_sf(data = ints, alpha = 0) + 
   ggtitle("Covariate 1")
+
 ggsave(paste(plot_save_dir,"cov1_points.png", sep = ""))
 
 
@@ -305,7 +326,7 @@ simulate_PP = function(loglambda)
   pointsY <- runif(n = Npoints, min = 0, max = max_dom)
   print(length(pointsX))
   
-  s = extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
+  s = terra::extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
   lambda_ratio <- exp(s$val- wmax)
   keep = runif(Npoints) < lambda_ratio
   print(sum(keep))
@@ -437,9 +458,6 @@ for(i in 1:n_meshes)
 }
 
 
-
-
-
 aa1 = purrr::map_dfr(models1,function(x) x$summary.fixed )[,c(1,3,5)]  %>%
   mutate(names  = rep(c("Int", "cov"), n_meshes),
          int_points = rep(paste("mesh", 1:n_meshes), each = 2),
@@ -468,4 +486,11 @@ rbind(aa1, aa2,aa3 ) %>%
   facet_grid(cov~ names, scales = "free") + xlab("") + ylab("")
 ggsave(paste(plot_save_dir,"results.png",sep =""))
 
-  
+rbind(aa1, aa2, aa3 ) %>% 
+  filter(names=="cov") %>%
+  ggplot() + geom_point(aes(x = mean, y = int_points)) +
+  geom_segment(aes(y = int_points, yend  = int_points, x = `0.025quant`, xend = `0.975quant`)) +
+  geom_vline(aes(xintercept = true), linetype = "dashed") + 
+  facet_grid(.~cov, scales = "free") +
+  labs(y = "Integration scheme", x = "Mean covariate effect", title = "Covariate effect") + 
+  theme_bw()
