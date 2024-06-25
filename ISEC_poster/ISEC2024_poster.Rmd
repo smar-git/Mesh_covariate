@@ -1,6 +1,6 @@
 ---
-main_topsize: 0.2 #percent coverage of the poster
-main_bottomsize: 0.1
+main_topsize: 0.15 #percent coverage of the poster
+main_bottomsize: 0.05
 title: '**Spatial Point Processes with INLA: are finer covariate resolutions always better?**'
 author:
   - name: Sara Martino
@@ -43,7 +43,7 @@ affiliation:
     address: Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
 
 main_findings:
-  - "The model only *sees* the covariate values at the integration points. Therefore, **the integration scheme and the covariates need to have similar scale and resolution**"
+  - "The model only *sees* the covariate values at the integration points. Therefore, **the integration scheme and the covariates need to have similar resolution**"
   
 logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
@@ -71,35 +71,54 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.table.format = "html") 
 ```
 
-# Introduction
-
 <!--# Author's order: I think we agreed Sara first and then alphabetical order and that's how's in the abstract so leaving it like that! -->
 
+# Rationale
+
 In ecology, spatial point processes (SPP) have become a popular
-statistical tool to model presence only data, both on their own, and as
-a building block for model complex models (i.e. integrated species
-distribution models). However, inference on SPP, particularly when
-incorporating spatially explicit random effects, poses significant
-complexity. A common strategy involves adopting the so-called
-log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
-implementation for efficient inference. Central to this approach is the
+statistical tool, and INLA/SPDE an efficient method to implement 
+them and make efficient inference. Central to this approach is the
 representation of a spatially continuous Gaussian random field as the
 solution of a stochastic partial differential equation (SPDE) defined
-over a triangular mesh spanning the spatial domain. The mesh definition
+over a triangular mesh spanning the spatial domain. Although the mesh definition
 is an important part of the model implementation. Equally crucial, yet
 often overlooked, is the role of integration points employed in
 numerically solving the stochastic integral inherent in the LGCP
 likelihood.
 
-## Objectives
+<!-- Intro: I would love this to be a bit shorter and maybe a bit less technical, worth giving it some thought. Also need to make sure we convey the message that this is not SPDE/INLA's fault, and this intro is very inla/SPDE centric which I'm not sure conveys that. The word covariate is not even mentioned! The main message is that we need to chose covariates that act at a scale appropirate for the mesh/ipoints, not that the mesh and the ipoints can be thought of separately -->
 
-1.  Pick a template layout.
-2.  Write/ create your poster content distraction free.
-3.  Press `CTRL+K` and let `{iheiddown}` do its thing!
+# Main problem
 
-Read the guide below (mostly identical to posterdown). It will make you
-familiar with the ways of creating a great poster.
+When  using the INLA/SPDE implementation, the model only _sees_ the covariates at the integration points. Therefore, a covariate with a range much shorter than the distance between integration points will cause the model to provide unreliable inference. 
 
+```{r, cropsfigure, fig.cap='In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable', out.width="90%"}
+
+library(tidyterra)
+library(ggplot2)
+library(terra)
+
+crops <- rast("ISEC_poster/crops.grd")
+crops <- trim(crops)
+
+ggplot() +
+  geom_spatraster(data = crops) +
+  scale_fill_whitebox_c(
+    palette = "muted",
+    labels = scales::label_number(suffix = "%"),
+    n.breaks = 12,
+    guide = guide_legend(reverse = TRUE)
+  ) +
+  
+  labs(
+    fill = "",
+    title = "Planted vegetation and crops",
+    subtitle = "Based on the CORINE 2016 data"
+  ) + 
+  theme_bw()
+```
+
+<!-- Main problem: I'd love to make this figure a bit bigger, like have the plot as wide as the column of text. Do you know how to do that?  -->
 # Methods
 
 I will show here how to include poster elements that may be useful, such
@@ -129,12 +148,6 @@ scatterplot with the infamous Iris dataset and I can even reference to
 the figure automatically like this, `Figure \@ref(fig:irisfigure)`,
 Figure \@ref(fig:irisfigure).
 
-```{r, irisfigure, fig.cap='Here is a caption for the figure. This can be added by using the "fig.cap" option in the r code chunk options, see this [link](https://yihui.name/knitr/options/#plots) from the legend himself, [Yihui Xie](https://twitter.com/xieyihui).', out.width="80%"}
-par(mar=c(2,2,0,1))
-plot(x = iris$Sepal.Length, y = iris$Sepal.Width,
-     col = iris$Species, pch = 19, xlab = "Sepal Length",
-     ylab = "Sepal Width")
-```
 
 Maybe you want to show off some of that fancy code you spent so much
 time on to make that figure, well you can do that too! Just use the
