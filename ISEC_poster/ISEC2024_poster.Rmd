@@ -43,7 +43,7 @@ affiliation:
     address: Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
 
 main_findings:
-  - "**Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates**"
+  - "The model only *sees* the covariate values at the integration points. Therefore, **the integration scheme and the covariates need to have similar scale and resolution**"
   
 logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
