@@ -82,11 +82,13 @@ for(i in 1:n_meshes)
 
 # simulate a covariate ----------------------------------------------------
 
-sim_mesh <- inla.mesh.2d(loc.domain = poly, 
-                         max.edge = c(5, 10))
+sim_mesh <- fm_mesh_2d_inla(boundary = poly, 
+                            max.edge = c(5, 10))
+
 sim_matern <- inla.spde2.pcmatern(sim_mesh,
                                   prior.sigma = c(1, 0.5),
                                   prior.range = c(1, 0.5))
+
 A = inla.spde.make.A(mesh = sim_mesh, loc  = crds(cov1))
 
 
@@ -94,10 +96,13 @@ range = 8
 sigma = 1
 Q <- inla.spde2.precision(spde = sim_matern,
                           theta = c(log(range),log(sigma)))
+
 samp1 <- inla.qsample(n = 2,
                      Q = Q,
                      mu = rep(0,dim(Q)[1]))
+
 val =  as.vector((A%*%samp1[,1]))
+
 #val =   ifelse(val<1.5,0,val)
 values(cov1) = val #- mean(val[val>0])
 names(cov1) =  "val"
@@ -146,7 +151,7 @@ simulate_PP = function(loglambda)
   pointsY <- runif(n = Npoints, min = 0, max = max_dom)
   print(length(pointsX))
   
-  s = extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
+  s = raster::extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
   lambda_ratio <- exp(s$val- wmax)
   keep = runif(Npoints) < lambda_ratio
   print(sum(keep))
@@ -170,29 +175,31 @@ points2 = simulate_PP(loglambda = loglambda2)
 points3 = simulate_PP(loglambda = loglambda3)
 
 
-
-
-
-ggplot() + geom_spatraster(data = cov1)+
+ggplot() + geom_spatraster(data = cov1) +
   geom_sf(data = points1, size = 0.3) +
   theme_maps + 
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
-ggplot() + geom_spatraster(data = cov2)+
+  theme_bw() + 
+
+ggplot() + geom_spatraster(data = cov2) +
   geom_sf(data = points2, size = 0.3) +
   theme_maps + 
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
+  theme_bw() + 
   
-ggplot() + geom_spatraster(data = cov3)+
+ggplot() + geom_spatraster(data = cov3) +
   geom_sf(data = points3, size = 0.3) +
   theme_maps + 
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
+  theme_bw() + 
   
-  plot_layout(ncol = 2)
+  plot_layout(ncol = 3)
 
 ggsave(paste(plot_save_dir,"simulatedPP.png",sep = ""))
+
 if(0)
   {
   data.frame( terra::extract(cov1, rbind(st_coordinates(points1), crds(cov1)))) %>% 
@@ -222,15 +229,9 @@ for(i in 1:n_meshes)
   ggsave(paste(plot_save_dir,"mesh",i,".png",sep = ""))
 }
 # FIT MODELS ----------------------------------------------------------------
-
 bru_options_set(bru_verbose = 2)
 
-
-
 ## MESH 1  --------------------------------------------------
- 
-
-
 models1 = list()
 models2 = list()
 models3 = list()
@@ -330,5 +331,6 @@ rbind(aa1, aa2, aa3 ) %>%
   ggplot() + geom_point(aes(x = mean, y = int_points)) +
   geom_segment(aes(y = int_points, yend  = int_points, x = `0.025quant`, xend = `0.975quant`)) +
   geom_vline(aes(xintercept = true), linetype = "dashed") + 
-  facet_grid(cov~ ., scales = "free") +
-  ggtitle("covariate")
+  facet_grid(.~cov, scales = "free") +
+  labs(y = "Integration scheme", x = "Mean covariate effect", title = "Covariate effect") + 
+  theme_bw()
