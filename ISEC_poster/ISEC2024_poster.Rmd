@@ -1,0 +1,175 @@
+---
+main_topsize: 0.2 #percent coverage of the poster
+main_bottomsize: 0.1
+title: '**Spatial Point Processes with INLA: are finer covariate resolutions always better?**'
+author:
+  - name: Sara Martino
+    affil: 1
+    main: true
+    email: 'sara.martino@ntnu.no'
+  - name: Leonardo Capitani
+    affil: 2
+    main: true
+    email: 'leocapi07@gmail.com'
+  - name: Virginia Morera-Pujol
+    affil: 3
+    main: true
+    email: 'morera.virginia@gmail.com'
+  - name: Erin Bryce
+    affil: 4
+    main: true
+    email: ''
+  - name: Jafet Belmont
+    affil: 5
+    main: true
+    email: ''
+  - name: Megan Morton
+    affil: 6
+    main: true
+    email: ''
+  - name: Janine Illian 
+    affil: 7
+    main: true
+    email: ''
+    
+affiliation:
+  - num: 1
+    address: Department of Mathematical Sciences, Norwegian University of Science and Technology
+  - num: 2
+    address: Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland
+  - num: 3
+    address: Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
+
+main_findings:
+  - "**Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates**"
+  
+logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
+logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
+logocenter_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
+output: 
+  iheiddown::iheiddown_betterport:
+    self_contained: false
+    pandoc_args: --mathjax
+    number_sections: false
+bibliography: packages.bib
+link-citations: true
+editor_options: 
+  markdown: 
+    wrap: 72
+  chunk_output_type: console
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      warning = FALSE,
+                      tidy = FALSE,
+                      message = FALSE,
+                      fig.align = 'center',
+                      out.width = "100%")
+options(knitr.table.format = "html") 
+```
+
+# Introduction
+
+<!--# Author's order: Which is the author's order on the abstract? Please Virginia take care of this as you have it on your laptop.-->
+
+In ecology, spatial point processes (SPP) have become a popular
+statistical tool to model presence only data, both on their own, and as
+a building block for model complex models (i.e. integrated species
+distribution models). However, inference on SPP, particularly when
+incorporating spatially explicit random effects, poses significant
+complexity. A common strategy involves adopting the so-called
+log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
+implementation for efficient inference. Central to this approach is the
+representation of a spatially continuous Gaussian random field as the
+solution of a stochastic partial differential equation (SPDE) defined
+over a triangular mesh spanning the spatial domain. The mesh definition
+is an important part of the model implementation. Equally crucial, yet
+often overlooked, is the role of integration points employed in
+numerically solving the stochastic integral inherent in the LGCP
+likelihood.
+
+## Objectives
+
+1.  Pick a template layout.
+2.  Write/ create your poster content distraction free.
+3.  Press `CTRL+K` and let `{iheiddown}` do its thing!
+
+Read the guide below (mostly identical to posterdown). It will make you
+familiar with the ways of creating a great poster.
+
+# Methods
+
+I will show here how to include poster elements that may be useful, such
+as an equation using mathjax:
+
+$$
+E = mc^2
+$$
+
+To reference a citation you can add your `.bib` file to the working
+directory and name it in the YAML metadata or generate an automated one
+as done here, then you only need to reference the label value in the
+`.bib` file [@dambly2023]. For example this package is built on top of
+the wonderful {pagedown} package and I will cite it at the end of this
+sentence using this in the rmd [@pagedown].
+
+To get a better understanding of how to include features like these
+please refer to the {iheiddown}
+[wiki](https://github.com/iheiddown/wiki).
+
+***Now on to the results!***
+
+# Results
+
+Here you may have some figures to show off, bellow I have made a
+scatterplot with the infamous Iris dataset and I can even reference to
+the figure automatically like this, `Figure \@ref(fig:irisfigure)`,
+Figure \@ref(fig:irisfigure).
+
+```{r, irisfigure, fig.cap='Here is a caption for the figure. This can be added by using the "fig.cap" option in the r code chunk options, see this [link](https://yihui.name/knitr/options/#plots) from the legend himself, [Yihui Xie](https://twitter.com/xieyihui).', out.width="80%"}
+par(mar=c(2,2,0,1))
+plot(x = iris$Sepal.Length, y = iris$Sepal.Width,
+     col = iris$Species, pch = 19, xlab = "Sepal Length",
+     ylab = "Sepal Width")
+```
+
+Maybe you want to show off some of that fancy code you spent so much
+time on to make that figure, well you can do that too! Just use the
+`echo=TRUE` option in the r code chunk options, Figure
+\@ref(fig:myprettycode)!
+
+```{r myprettycode, echo=TRUE, fig.cap='Boxplots, so hot right now!', fig.height=6, out.width="80%"}
+#trim whitespace
+par(mar=c(2,2,0,0))
+#plot boxplots
+boxplot(iris$Sepal.Width~iris$Species,
+        col = "#ed2215", 
+        border = "#800000",
+        ylab = "Sepal Width (cm)",
+        xlab = "Species")
+```
+
+How about a neat table of data? See, Table \@ref(tab:iristable):
+
+```{r, iristable}
+knitr::kable(
+  iris[1:15,1:5], format = "html",
+  caption = "A table made with the **knitr::kable** function.",
+  align = "c", col.names = c("Sepal <br> Length",
+                             "Sepal <br> Width",
+                             "Petal <br> Length",
+                             "Petal <br> Width",
+                             "Species"),
+  escape = FALSE)
+```
+
+# Conclusions
+
+Using both simulations and real-world ecological data, we illustrate
+these challenges and offer guidelines to empower users in navigating
+these complexities and mitigating potential pitfalls when using these
+methods in ecological applications such as species distribution models
+based on presence-only data.
+
+# References

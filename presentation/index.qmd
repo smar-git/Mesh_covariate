@@ -1,0 +1,416 @@
+---
+title: "The mess with the mesh"
+subtitle: ""
+author: Sara Martino (++)
+format:
+  revealjs: 
+    slide-number: true
+    chalkboard: 
+      buttons: false
+    preview-links: auto
+#    logo: images/quarto.png
+#    css: styles.css
+#    footer: <https://quarto.org>
+resources:
+  - demo.pdf
+---
+
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, echo = FALSE,
+                      message = FALSE, warning = FALSE,
+                      fig.width=5, fig.height=5)
+
+
+
+library(tidyverse)
+library(inlabru)
+library(patchwork)
+library(INLA)
+library(sf)
+library(scico)
+library(tidyterra)
+library(scico)
+library(terra)
+rm(list = ls())
+
+set.seed(123)
+theme_maps = list(theme(axis.title.x=element_blank(),
+                        axis.text.x=element_blank(),
+                        axis.ticks.x=element_blank(),
+                        axis.title.y=element_blank(),
+                        axis.text.y=element_blank(),
+                        axis.ticks.y=element_blank()),
+                  scale_fill_scico(na.value = "transparent"),
+                  scale_color_scico(na.value = "transparent"))
+
+
+```
+
+
+
+## ..how we started:
+
+![](figures/paper_dambly.png){width="41"}
+
+## Highlights of the paper (I)
+
+The data
+
+![](figures/data.png){.absolute top="170" left="300" width="400" height="400"}
+
+## Highlights of the paper (II)
+
+The covariates:
+
+![](figures/Covariate.png){.absolute top="170" left="30" width="1000" height="500"}
+
+## Highlights of the paper (III)
+
+The model:
+
+```{=tex}
+\begin{align}
+N(A)\sim\text{Poisson}\left(\int_A \lambda(s) ds \right) \\
+\log(\lambda(s)) = \beta_0 + \mathbf{\beta}^T \mathbf{X}(s) + \omega(s)
+\end{align}
+```
+
+with $\omega(s)$ being a Matern field, represented using the SPDE approach
+
+## Highlights of the paper (IV)
+
+The meshes:
+
+![](figures/meshes.png){.absolute top="170" left="30" width="1000" height="500"}
+
+## Highlights of the paper (V)
+
+The results: Covariate effects
+
+![](figures/cov_estimates.png){.absolute top="170" left="30" width="1000" height="500"}
+
+
+## Highlights of the paper (VI)
+
+The results: Predicted intensity
+
+`![](figures/pred_intensity.png){.absolute top="170" left="30" width="1000" height="500"}
+
+
+## Are things really so bad?
+
+
+
+## The LCGP likelihood
+
+
+```{=tex}
+\begin{equation}
+\pi(Y|\lambda) = \underbrace{\exp\left\{|\Omega| - \int_{\Omega}\lambda(s)ds\right\}}_{\text{on the whole domain}}\underbrace{\prod_{s_i\in Y}\lambda(s_i)}_{\text{at the observed points}}
+\end{equation}
+```
+
+
+## The SPDE approximation $\omega(s) = \sum_{i = 1}^n\omega_i\phi_i(s)$
+
+![](figures/spde.png){fig-align="center" style="border: 3px solid #dee2e6;" width="780" height="300" }
+
+  * $\omega = (\omega_1,\dots, \omega_n)$  multivariate Gaussian random vector 
+  * $\phi_1(s), \dots, \phi_n(s)$ set of linearly independent deterministic basis functions
+
+
+## Compute the log-likelihood{.smaller}
+
+
+```{=tex}
+\begin{align}
+\log\pi(Y|\lambda) = & |\Omega| - \int_{\Omega}\lambda(s)ds +  \sum_{s_i\in Y}\log\lambda(s_i)\\
+= & C + \int_{\Omega}\exp\left\{\beta_0 + \beta^T X(s) + \omega(s)\right\}\ ds +  \sum_{s_i\in Y}\left\{ \beta_0 + \beta^T X(s_i) + \omega(s_i)\right\}\\
+\approx &C + \underbrace{\int_{\Omega}\exp\left\{\beta_0 + \beta^T X(s) + \sum_{j = 1}^n\omega_j\phi_j(s)\right\}\ ds}_{\text{Need to approximate numerically}} + \\ 
+& \underbrace{\sum_{s_i\in Y}\left\{ \beta_0 + \beta^T X(s_i) + \sum_{j = 1}^n\omega_j\phi_j(s_i)\right\}}_{\text{Can compute!}}
+\end{align}
+```
+
+## Numerical Integration{.smaller} 
+We use that
+$$
+\int_{\Omega}f(s)\ ds\approx \sum_{i = 1}^p
+\tilde{\alpha}_i f(\tilde{s}_i)
+$$
+then: 
+
+```{=tex}
+\begin{align}
+\int_{\Omega}\exp\left\{\beta_0 + \beta^T X(s) + \sum_{j = 1}^n\omega_j\phi_j(s)\right\}\ ds \approx \\
+\sum_{i = 1}^p \tilde{\alpha}_i \exp \left\{\beta_0 + \beta^T X(\tilde{s}_i) + \sum_{j = 1}^n\omega_j\phi_j(\tilde{s}_j)\right\}
+\end{align}
+```
+
+**Note 1:** Both the covariates and the random field are "seen" only at the integration points
+
+**Note 2:** By default the integration points are the mesh nodes
+
+
+
+## Example
+
+```{r}
+#| fig-width: 12
+#| fig-align: center
+#| cache: true
+# define domain -----------------------------------------------------------
+
+simulate_PP = function(loglambda)
+{
+  wmax <- max(values(loglambda))
+  Npoints <- rpois(1, lambda = max_dom^2 * exp(wmax))
+  pointsX <- runif(n = Npoints, min = 0, max = max_dom)
+  pointsY <- runif(n = Npoints, min = 0, max = max_dom)
+
+  s = extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
+  lambda_ratio <- exp(s$val- wmax)
+  keep = runif(Npoints) < lambda_ratio
+  points = st_as_sf(data.frame(x = pointsX, y =  pointsY)[keep,],
+                    coords = c("x","y"))
+  return(points)
+}
+
+max_dom  = 500
+res = 1
+
+max_dom  = 500
+res = 1
+
+box = c(xmin = 0 , 
+        ymin = 0,
+        xmax = max_dom,
+        ymax = max_dom)
+poly <- data.frame(x = box[c(1,3)], y = box[c(2,4)]) %>% 
+  st_as_sf(coords = c("x", "y")) %>% 
+  st_bbox() %>% 
+  st_as_sfc()
+
+
+cov <- rast(nrows = max_dom/res, ncols=max_dom/res, xmin=0, xmax=max_dom, ymin = 0, ymax = max_dom)
+
+## create meshes and int points -----------------------------------------------------------
+
+mesh =  fm_mesh_2d_inla(boundary = poly,
+                               max.edge = c(75,80))
+
+
+# simulate a covariate ----------------------------------------------------
+
+sim_mesh <- fm_mesh_2d(loc.domain = (poly), 
+                         max.edge = c(10, 40))
+sim_matern <- inla.spde2.pcmatern(sim_mesh,
+                                  prior.sigma = c(1, 0.5),
+                                  prior.range = c(1, 0.5))
+A = inla.spde.make.A(mesh = sim_mesh, loc  = crds(cov))
+
+
+range = 50
+sigma = 1
+Q <- inla.spde2.precision(spde = sim_matern,
+                          theta = c(log(range),log(sigma)))
+samp1 <- inla.qsample(n = 2,
+                     Q = Q,
+                     mu = rep(0,dim(Q)[1]))
+val =  as.vector((A%*%samp1[,1]))
+values(cov) = val #- mean(val[val>0])
+names(cov) =  "val"
+
+points1 = simulate_PP(loglambda = -9 + 0.2 * cov)
+
+p1 = ggplot() + geom_spatraster(data= cov) + geom_sf(data = points1) +  theme_maps + xlim(range(mesh$loc[,1]))+ ylim(range(mesh$loc[,2])) + theme(legend.position = "none")
+p2 = ggplot() + gg(mesh) + coord_equal()+  theme_maps + theme(legend.position = "none")
+
+mesh_nodes = data.frame(x = mesh$loc[,1], y = mesh$loc[,2]) %>%
+  st_as_sf(coords= c("x","y"))
+
+all_points = rbind(points1, mesh_nodes)  
+val = terra::extract(cov, rbind(points1, mesh_nodes))
+
+all_points$val = val$val
+
+p3 = ggplot() +geom_sf(data = all_points, aes(color = val)) +  theme_maps  +  xlim(range(mesh$loc[,1]))+ ylim(range(mesh$loc[,2]))+ theme(legend.position = "none")
+
+p1 + p2 + p3
+
+```
+
+The implicit assumption is that the value of the covariate over the whole domain is well represented by the values at the mesh nodes (..or other intergration points!)
+
+
+## A simulated example...
+
+
+![](plots/random_mesh/covariates.png){fig-align="center" width="600" height="600" }
+
+
+## using different meshes...
+
+![](plots/random_mesh/meshes.png){fig-align="center" width="600" height="600" }
+
+## How does the model "see" the covariates? (I)
+
+![](plots/random_mesh/cov1_points.png){fig-align="center" width="600" height="600" }
+
+## How does the model "see" the covariates? (II)
+
+![](plots/random_mesh/cov2_points.png){fig-align="center" width="600" height="600" }
+
+## How does the model "see" the covariates? (III)
+
+![](plots/random_mesh/cov3_points.png){fig-align="center" width="600" height="600" }
+
+## Integrating covariates over space
+
+![](plots/random_mesh/integrated_cov.png){fig-align="center" width="600" height="600" }
+
+## Simulated data
+
+![](plots/random_mesh/ simulatedPP.png){fig-align="center" width="600" height="600" }
+
+## Model and results
+
+
+::: columns
+::: {.column width="35%"}
+$$
+\log\lambda(s) = \beta_0 + \beta_1 x(s)
+$$
+:::
+
+::: {.column width="65%"}
+![](plots/random_mesh/results.png){fig-align="center" width="600" height="600" }
+
+:::
+:::
+
+
+## Another example
+
+The meshes:
+
+![](plots/test_mesh/mesh1.png){width=20%}
+![](plots/test_mesh/mesh2.png){width=20%}
+![](plots/test_mesh/mesh3.png){width=20%}
+![](plots/test_mesh/mesh4.png){width=20%}
+![](plots/test_mesh/mesh5.png){width=20%}
+
+
+## Model and Simulated data
+
+
+
+::: columns
+::: {.column width="35%"}
+$$
+\log\lambda(s) = \beta_0 + \beta_1 x(s)
+$$
+:::
+
+::: {.column width="65%"}
+![](plots/test_mesh/simulatedPP.png){fig-align="center" width="600" height="600" }
+
+:::
+:::
+
+
+## Results
+
+![](plots/test_mesh/results.png){fig-align="center" width=100%}
+
+
+## Adding a random field
+
+The model
+$$
+\log\lambda(s) = \beta_0 + \beta_1 x(s) + \omega(s) 
+$$
+Now thigs get more complicated:
+
+  * The mesh is needed *both* to define the SPDE representation of the RF *and* to set the integration points
+  
+  * The two things can be (partially) separated
+  
+## Simulated Intensities
+
+![](plots/test_mesh_spde/loglambda.png){.absolute top=50 left=0 width=700 height=800}
+
+## Simulated Data
+
+![](plots/test_mesh_spde/data.png)
+
+
+## The SPDE mesh
+
+![](plots/test_mesh_spde/ mesh1.png)
+
+## The integration meshes
+
+![](plots/test_mesh_spde/mesh2.png){}
+
+## The integration meshes
+
+![](plots/test_mesh_spde/all_meshes.png){.absolute top=50 left=0 width=700 height=800}
+
+
+## Results 
+
+Fixed effects:
+
+
+::: {#fig layout-ncol=2}
+
+![](plots/test_mesh_spde/res_int.png)
+
+![](plots/test_mesh_spde/res_covariate.png)
+
+:::
+
+
+
+## Results
+
+Parameters of the random field:
+
+::: {#fig2 layout-ncol=2}
+
+![](plots/test_mesh_spde/res_range.png)
+
+![](plots/test_mesh_spde/res_sd.png)
+
+:::
+
+
+## Results
+
+Posterior mean of the latent field:
+
+::: {#fig2 layout-ncol=2}
+
+![](plots/test_mesh_spde/post_mean1.png){ width=150% height=150%}
+
+
+![](plots/test_mesh_spde/post_mean3.png){width=100%}
+
+:::
+
+  
+## Results
+
+Posterior sd of the latent field:
+
+::: {#fig2 layout-ncol=2}
+
+![](plots/test_mesh_spde/post_sd1.png){ width=150% height=150%}
+
+
+![](plots/test_mesh_spde/post_sd3.png){width=100%}
+
+:::
+  
+ 

@@ -27,7 +27,11 @@ library(scico)
 library(tidyterra)
 library(scico)
 library(terra)
+library(ggmagnify)
 rm(list = ls())
+
+set.seed(3240)
+plot_save_dir  = "presentation/plots/test_mesh_spde/"
 
 
 theme_maps = list(theme(axis.title.x=element_blank(),
@@ -65,7 +69,7 @@ cov3 <- rast(nrows = max_dom/res, ncols=max_dom/res, xmin=0, xmax=max_dom, ymin 
 ## create meshes and int points -----------------------------------------------------------
 meshes = list()
 meshes[[1]] =  fm_mesh_2d_inla(boundary = poly,
-                               max.edge = c(60,100))
+                               max.edge = c(60,80))
 
 #ggplot() + gg(meshes[[1]]) + coord_equal()
 n_meshes = 4
@@ -116,8 +120,8 @@ val = round(val)
 values(cov1) = val
 names(cov1) =  "val"
 
-ggplot() + geom_spatraster(data = cov1) + scale_fill_scico( direction = -1) +
-  gg(meshes[[1]]) + coord_equal() + ggtitle("Covariate 1") + theme_maps
+# ggplot() + geom_spatraster(data = cov1) + scale_fill_scico( direction = -1) +
+#   gg(meshes[[1]]) + coord_equal() + ggtitle("Covariate 1") + theme_maps
 
 
 # covariate that varies in space with a larger range!
@@ -132,8 +136,8 @@ val =  as.vector((A%*%samp2[,1]))
 val = val
 values(cov2) = val 
 names(cov2) =  "val"
-ggplot() + geom_spatraster(data = cov2) + scale_fill_scico( direction = -1) +
-  gg(meshes[[1]]) + coord_equal()+ ggtitle("Covariate 2") + theme_maps
+# ggplot() + geom_spatraster(data = cov2) + scale_fill_scico( direction = -1) +
+#   gg(meshes[[1]]) + coord_equal()+ ggtitle("Covariate 2") + theme_maps
 
 # covariate that varies very smoothly in space
 range = 600
@@ -147,8 +151,8 @@ val =  as.vector((A%*%samp3[,1]))
 values(cov3) = val- mean(val)
 names(cov3) =  "val"
 
-ggplot() + geom_spatraster(data = cov3) + scale_fill_scico( direction = -1) +
-  gg(meshes[[1]])+ coord_equal()+ ggtitle("Covariate 3") + theme_maps
+# ggplot() + geom_spatraster(data = cov3) + scale_fill_scico( direction = -1) +
+#   gg(meshes[[1]])+ coord_equal()+ ggtitle("Covariate 3") + theme_maps
 
 
 #' \newpage
@@ -171,8 +175,8 @@ matern <- rast(nrows = max_dom/res, ncols=max_dom/res,
                ymin = 0, ymax = max_dom)
 matern$val = as.vector((A%*%samp[,1]))
 
-ggplot() + geom_spatraster(data = matern) + scale_fill_scico( direction = -1) +
-  gg(meshes[[1]])+ coord_equal()+ ggtitle("Matern field ") + theme_maps
+# ggplot() + geom_spatraster(data = matern) + scale_fill_scico( direction = -1) +
+#   gg(meshes[[1]])+ coord_equal()+ ggtitle("Matern field ") + theme_maps
 
 
 
@@ -197,9 +201,9 @@ simulate_PP = function(loglambda)
 }
 
 
-int1 = -7
-int2 = -7
-int3 = -7
+int1 = -7.5
+int2 = -7.5
+int3 = -7.5
 beta = -1.3
 
 loglambda1 = int1 + beta * cov1 + 1 * matern
@@ -211,31 +215,48 @@ points2 = simulate_PP(loglambda = loglambda2)
 points3 = simulate_PP(loglambda = loglambda3)
 
 
+# plot covariates + intensity ---------------------------------------------
 
+p1 = ggplot() + geom_spatraster(data = cov1) + theme_maps + theme(legend.position = "none") + coord_equal() +
+  ggtitle("Cov 1")
+p2 = ggplot() + geom_spatraster(data = cov2) + theme_maps + theme(legend.position = "none") + coord_equal() +
+  ggtitle("Cov 2")
+p3 = ggplot() + geom_spatraster(data = cov3) + theme_maps + theme(legend.position = "none") + coord_equal() +
+  ggtitle("Cov 3")
+p4 = ggplot() + geom_spatraster(data = matern) + theme_maps + theme(legend.position = "none") + coord_equal() +
+  ggtitle("Random Field")
+p5 = ggplot() + geom_spatraster(data = loglambda1) + theme_maps + theme(legend.position = "none") + coord_equal() +
+ ggtitle("loglambda 1")
+p6 = ggplot() + geom_spatraster(data = loglambda2) + theme_maps + theme(legend.position = "none") + coord_equal() +
+  ggtitle("loglambda 2")
+p7 = ggplot() + geom_spatraster(data = loglambda3) + theme_maps + theme(legend.position = "none") + coord_equal() +
+  ggtitle("loglambda 3")
+
+p1 + p2 + p3 + plot_spacer() + p4 + plot_spacer() + p5 + p6 + p7
+ggsave(paste(plot_save_dir,"loglambda.png",sep = ""))
 
 
 ggplot() + geom_spatraster(data = beta * cov1 + matern)+
-  geom_sf(data = points1) +
+  geom_sf(data = points1, size = .5) +
   theme_maps + 
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
 ggplot() + geom_spatraster(data = beta * cov2 + matern)+
-  geom_sf(data = points2) +
+  geom_sf(data = points2, size = .5) +
   theme_maps + 
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
   
 ggplot() + geom_spatraster(data = beta * cov3 + matern)+
-  geom_sf(data = points3) +
+  geom_sf(data = points3, size = .5) +
   theme_maps + 
   scale_fill_scico(direction = -1) + 
   theme(legend.position = "none") +
+  plot_layout(ncol = 2)
+ggsave(paste(plot_save_dir,"data.png",sep = "")) 
 
-ggplot() + geom_spatraster(data = matern) +   
-  theme_maps + 
-  scale_fill_scico(direction = -1) + 
-  theme(legend.position = "none") +
-    plot_layout(ncol = 2)
+
+
 
 
 if(0)
@@ -256,6 +277,65 @@ if(0)
     group_by(p) %>%
     summarise(m = mean(val))
 }
+
+
+
+
+# plot meshes -------------------------------------------------------------
+
+
+
+
+
+main_plot2 = ggplot() + gg(meshes[[1]]) + coord_equal() + 
+  xlab("") + ylab("") 
+main_plot2 + geom_rect(data = data.frame(),
+                      aes(xmin = 0, xmax = 80, ymin = 0, ymax = 80),
+                      colour = "red", fill = NA, size = 1)
+ggsave(paste(plot_save_dir, "mesh1.png"))
+
+
+addSmallLegend <- function(myPlot, pointSize = 0.5, textSize = 7, spaceLegend = 0.1) {
+  myPlot +
+    guides(shape = guide_legend(override.aes = list(size = pointSize)),
+           color = guide_legend(override.aes = list(size = pointSize))) +
+    theme(legend.title = element_text(size = textSize), 
+          legend.text  = element_text(size = textSize),
+          legend.key.size = unit(spaceLegend, "lines"))
+}
+
+
+
+p1 = ggplot() + gg(meshes[[1]]) +
+  geom_sf(data = int_points[[1]], aes(  color = weight),
+             size = 1) +  
+  xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80)) 
+p1 = addSmallLegend(p1) + guides(color=guide_legend(title=""))
+
+p2 = ggplot() + gg(meshes[[1]]) +
+   geom_sf(data = int_points[[2]], aes(  color = weight),
+           size = 1) +  
+   xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80)) 
+p2 = addSmallLegend(p2) + guides(color=guide_legend(title=""))
+ 
+ 
+p3 =  ggplot() + gg(meshes[[1]]) +
+   geom_sf(data = int_points[[3]], aes(  color = weight),
+           size = 1) +  
+   xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80)) 
+p3 = addSmallLegend(p3) + guides(color=guide_legend(title=""))
+
+ 
+ 
+p4 =  ggplot() + gg(meshes[[1]]) +
+   geom_sf(data = int_points[[4]], aes(  color = weight),
+           size = 1) +  
+   xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80))
+p4 = addSmallLegend(p4) + guides(color=guide_legend(title=""))
+
+ p1 + p2 + p3 + p4
+
+ggsave(paste(plot_save_dir, "mesh2.png", sep = "")) 
 
 #' \newpage
 #' ## Fit the models
@@ -370,13 +450,13 @@ for(ii in 1:n_meshes)
       list1[[kk]] = ggplot() + gg(meshes[[ii]]) + 
         #ggtitle(paste("int_point", idx_mesh)) +
         coord_equal() + theme_maps + 
-        geom_sf(data = int_points[[jj]], aes(color = weight)) +
+        geom_sf(data = int_points[[jj]], aes(color = weight), size= 0.1) +
         theme(legend.position  = "none") 
       kk = kk + 1
     }
   }
 wrap_plots(list1)  
-
+ggsave(paste(plot_save_dir, "all_meshes.png", sep = ""))
 
 
 #'\newpage
@@ -418,16 +498,18 @@ create_plots = function(mods)
                                   x = q1, xend = q2)) +
       geom_point(aes(y = mesh_spde, x = mean)) +
       geom_vline(aes(xintercept = true)) +
-        xlab("") + ylab("") 
-      p1
+        xlab("") + ylab("") +
+      theme(axis.text.x=element_text(angle=90))
+    p1
       
       p2 = df_fixed %>% filter(param == "cov") %>%
         ggplot() + geom_segment(aes(y = mesh_spde, yend = mesh_spde,
                                     x = q1, xend = q2)) +
         geom_point(aes(y = mesh_spde, x = mean)) +
         geom_vline(aes(xintercept = true)) +
-        xlab("") + ylab("") 
-    p2   
+        xlab("") + ylab("") +
+        theme(axis.text.x=element_text(angle=90))
+      p2   
    plots_cov[[idx_mesh]] =    p2
    plots_int[[idx_mesh]] =    p1
    
@@ -449,7 +531,8 @@ create_plots = function(mods)
                                  x = q1, xend = q2)) +
      geom_point(aes(y = mesh_spde, x = mean)) +
      geom_vline(aes(xintercept = range_matern)) +
-     xlab("") + ylab("") 
+     xlab("") + ylab("") +
+     theme(axis.text.x=element_text(angle=90))
    p3
    
    p4 = df_hyper %>% filter(param == "sd") %>%
@@ -457,7 +540,8 @@ create_plots = function(mods)
                                  x = q1, xend = q2)) +
      geom_point(aes(y = mesh_spde, x = mean)) +
      geom_vline(aes(xintercept = sigma_matern)) +
-     xlab("") + ylab("") 
+     xlab("") + ylab("") +
+     theme(axis.text.x=element_text(angle=90))
    p4 
    plots_range[[idx_mesh]] =    p3
    plots_sd[[idx_mesh]] =    p4
@@ -475,27 +559,95 @@ plots3 = create_plots(models3)
 wrap_plots(c(plots1$covariate, plots2$covariate, plots3$covariate))+
   plot_layout(axes ="collect_y", tag_level = "new") +
   plot_annotation(title = "Estimated Covariate")
-
+ggsave(paste(plot_save_dir,"res_covariate.png",sep = ""))
 
 
 wrap_plots(c(plots1$intercept, plots2$intercept, plots3$intercept))+
   plot_layout(axes ="collect_y") +
   plot_annotation(title = "Estimated Intercept")
+ggsave(paste(plot_save_dir,"res_int.png",sep = ""))
 
 wrap_plots(c(plots1$range, plots2$range, plots3$range))+
   plot_layout(axes ="collect_y") +
   plot_annotation(title = "Estimated Range")
+ggsave(paste(plot_save_dir,"res_range.png",sep = ""))
 
 wrap_plots(c(plots1$sd, plots2$sd, plots3$sd))+
   plot_layout(axes ="collect_y") +
   plot_annotation(title = "Estimated Sd")
+ggsave(paste(plot_save_dir,"res_sd.png",sep = ""))
 
 
 
 
+# predictions for model 1 -------------------------------------------------
+
+
+pxl = fm_pixels(meshes[[1]], mask = poly)
+
+create_predictions_spde = function(mods)
+{
+  plots_means = list()
+  plots_sd = list()
+  
+  for(idx_mesh in 1:n_meshes)
+  { 
+    
+    err = purrr::map(mods[[idx_mesh]],function(x) x$error )
+    null = purrr::map_int(mods[[idx_mesh]],function(x) !is.null(x) )
+    err = data.frame(idx = 1:n_meshes, valid = sapply(err,function(x) is.null(x)))
+    err$null = null
+    err = err$idx[null>0 & err$valid]
+    print(err)
+    
+    plots_means[[idx_mesh]] = list()
+    plots_sd[[idx_mesh]] = list()
+    
+    for(i in 1:n_meshes)
+    {
+      if (i %in% err)
+      {
+        aa = predict(mods[[idx_mesh]][[i]], pxl, ~   matern )
+        plots_means[[idx_mesh]][[i]] = ggplot() + geom_sf(data = aa, aes(color = mean)) +
+          scale_color_scico() + theme_maps
+        plots_sd[[idx_mesh]][[i]] = ggplot() + geom_sf(data = aa, aes(color = sd)) +
+          scale_color_scico() + theme_maps
+      }else{
+        plots_means[[idx_mesh]][[i]] = plot_spacer()
+        plots_sd[[idx_mesh]][[i]] = plot_spacer()
+        
+      }
+    }
+  }
+  out = list(means  = plots_means, sds = plots_sd)
+  return(out)
+}
+
+pred1 = create_predictions_spde(models1)
+pred2 = create_predictions_spde(models2)
+pred3 = create_predictions_spde(models3)
+
+wrap_plots(c(pred1$means[[1]], pred1$means[[2]], 
+             pred1$means[[3]], pred1$means[[4]]))+
+  plot_annotation(title = "Cov 1")
+ggsave(paste(plot_save_dir, "post_mean1.png", sep = ""))
+wrap_plots(c(pred3$means[[1]], pred3$means[[2]],
+             pred3$means[[3]], pred3$means[[4]]))+
+  plot_annotation(title = "Cov 3")
+ggsave(paste(plot_save_dir, "post_mean3.png", sep = ""))
 
 
 
+wrap_plots(c(pred1$sds[[1]], pred1$sds[[2]], 
+             pred1$sds[[3]], pred1$sds[[4]]))+
+plot_annotation(title = "Cov 1")
+
+ggsave(paste(plot_save_dir, "post_sd1.png", sep = ""))
+
+wrap_plots(c(pred3$sds[[1]], pred3$sds[[2]], 
+             pred3$sds[[3]], pred3$sds[[4]]))+
+  plot_annotation(title = "Cov 3")
+ggsave(paste(plot_save_dir, "post_sd3.png", sep = ""))
 
 
 
