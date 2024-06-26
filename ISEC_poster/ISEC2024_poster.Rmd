@@ -1,29 +1,36 @@
 ---
 main_topsize: 0.2 #percent coverage of the poster
-main_bottomsize: 0.01
+main_bottomsize: 0.05
 title: '**Spatial Point Processes with INLA: are finer covariate resolutions always better?**'
 author:
   - name: Sara Martino
     affil: 1
     main: true
+    email: 'sara.martino@ntnu.no'
   - name: Jafet Belmont
     affil: 2
     main: true
+    email: 'Jafet.BelmontOsuna@glasgow.ac.uk'
   - name: Erin Bryce
     affil: 2
     main: true
+    email: 'Erin.Bryce@glasgow.ac.uk'
   - name: Leonardo Capitani 
     affil: 3
     main: true
+    email: 'leocapi07@gmail.com'
   - name: Virginia Morera-Pujol
     affil: 4
     main: true
+    email: 'morera.virginia@gmail.com'
   - name: Megan Morton
     affil: 2
     main: true
+    email: 'Megan.Laxton@glasgow.ac.uk'
   - name: Janine Illian 
     affil: 2
     main: true
+    email: 'Janine.Illian@glasgow.ac.uk'
 
 affiliation:
   - num: 1
@@ -82,7 +89,7 @@ likelihood.
 
 When  using the INLA/SPDE implementation, the model only _sees_ the covariates at the integration points. Therefore, a covariate with a range much shorter than the distance between integration points will cause the model to provide unreliable inference. 
 
-```{r, cropsfigure, fig.cap='In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable', out.width="90%"}
+```{r, cropsfigure, fig.cap='In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable', fig.align='center', out.width="130%"}
 
 library(tidyterra)
 library(ggplot2)
@@ -108,13 +115,14 @@ ggplot() +
   theme_bw()
 ```
 
-<!-- Main problem: I'd love to make this figure a bit bigger, like have the plot as wide as the column of text. Do you know how to do that?  -->
+<!-- Is there a way to centre this figure and the covariates one? Ive used fig.align in the chunk options but they are weirdly aligned to the right of the column  -->
+
 
 # An example
 
 Let's picture three covariates with very different ranges: 
 
-```{r, covars, fig.cap='Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600', out.width="90%"}
+```{r, covars, fig.cap='Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600', fig.align='left', out.width="130%"}
 
 library(ggplot2)
 library(terra)
@@ -187,6 +195,12 @@ ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
 
 After fitting one model with each mesh to the same point pattern, we can see how the coefficients vary much more for the covariate with the shortest range (Covariate 1), whereas the coefficients for the covariate with the longest range (Covariate 3) are much more stable 
 
+$$
+log(\lambda(s)) = \beta_{0} + \beta_{1}Covariate
+$$
+
+
+
 ```{r, coefficients, fig.cap='This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.', out.width="90%"}
 
 library(tidyterra)
@@ -222,43 +236,6 @@ coefs %>%
 
 ```
 
-# A real world example
-
-Here you may have some figures to show off, bellow I have made a
-scatterplot with the infamous Iris dataset and I can even reference to
-the figure automatically like this, `Figure \@ref(fig:irisfigure)`,
-Figure \@ref(fig:irisfigure).
-
-
-Maybe you want to show off some of that fancy code you spent so much
-time on to make that figure, well you can do that too! Just use the
-`echo=TRUE` option in the r code chunk options, Figure
-\@ref(fig:myprettycode)!
-
-```{r myprettycode, echo=TRUE, fig.cap='Boxplots, so hot right now!', fig.height=6, out.width="80%"}
-#trim whitespace
-par(mar=c(2,2,0,0))
-#plot boxplots
-boxplot(iris$Sepal.Width~iris$Species,
-        col = "#ed2215", 
-        border = "#800000",
-        ylab = "Sepal Width (cm)",
-        xlab = "Species")
-```
-
-How about a neat table of data? See, Table \@ref(tab:iristable):
-
-```{r, iristable}
-knitr::kable(
-  iris[1:15,1:5], format = "html",
-  caption = "A table made with the **knitr::kable** function.",
-  align = "c", col.names = c("Sepal <br> Length",
-                             "Sepal <br> Width",
-                             "Petal <br> Length",
-                             "Petal <br> Width",
-                             "Species"),
-  escape = FALSE)
-```
 
 # Conclusions
 
