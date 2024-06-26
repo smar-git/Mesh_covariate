@@ -99,7 +99,7 @@ for(i in 1:n_meshes)
 
 # here we use a fine mesh to simulate the RF
 
-sim_mesh <- inla.mesh.2d(loc.domain = poly, 
+sim_mesh <- fm_mesh_2d_inla(loc.domain = poly, 
                          max.edge = c(5, 10))
 sim_matern <- inla.spde2.pcmatern(sim_mesh,
                                   prior.sigma = c(1, 0.5),
@@ -191,7 +191,7 @@ simulate_PP = function(loglambda)
   pointsY <- runif(n = Npoints, min = 0, max = max_dom)
   print(length(pointsX))
   
-  s = extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
+  s = terra::extract(loglambda, st_as_sf(data.frame(x = pointsX, y = pointsY), coords = c("x","y")))
   lambda_ratio <- exp(s$val- wmax)
   keep = runif(Npoints) < lambda_ratio
   print(sum(keep))
@@ -631,12 +631,11 @@ wrap_plots(c(pred1$means[[1]], pred1$means[[2]],
              pred1$means[[3]], pred1$means[[4]]))+
   plot_annotation(title = "Cov 1")
 ggsave(paste(plot_save_dir, "post_mean1.png", sep = ""))
+
 wrap_plots(c(pred3$means[[1]], pred3$means[[2]],
              pred3$means[[3]], pred3$means[[4]]))+
   plot_annotation(title = "Cov 3")
 ggsave(paste(plot_save_dir, "post_mean3.png", sep = ""))
-
-
 
 wrap_plots(c(pred1$sds[[1]], pred1$sds[[2]], 
              pred1$sds[[3]], pred1$sds[[4]]))+
@@ -648,137 +647,4 @@ wrap_plots(c(pred3$sds[[1]], pred3$sds[[2]],
              pred3$sds[[3]], pred3$sds[[4]]))+
   plot_annotation(title = "Cov 3")
 ggsave(paste(plot_save_dir, "post_sd3.png", sep = ""))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
