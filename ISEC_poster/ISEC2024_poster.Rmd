@@ -72,22 +72,13 @@ options(knitr.table.format = "html")
 
 # Rationale
 
-In ecology, spatial point processes (SPP) have become a popular
-statistical tool, and INLA/SPDE an efficient method to implement 
-them and make efficient inference. Central to this approach is the
-representation of a spatially continuous Gaussian random field as the
-solution of a stochastic partial differential equation (SPDE) defined
-over a triangular mesh spanning the spatial domain. Although the mesh definition
-is an important part of the model implementation. Equally crucial, yet
-often overlooked, is the role of integration points employed in
-numerically solving the stochastic integral inherent in the LGCP
-likelihood.
+In ecology, spatial point processes (SPP) are a statistical methodology that are becoming increasingly popular through their implementation using INLA/SPDE as an inference technique. Key to this approach is the representation of a spatially continuous Gaussian random field, defined over a triangular mesh spanning the spatial domain. Crucial to model implementation is the choice of spatial information (covariates). The resolution and scale of these needs to be taken into account when designing the mesh and associated integration scheme. 
 
-<!-- Intro: I would love this to be a bit shorter and maybe a bit less technical, worth giving it some thought. Also need to make sure we convey the message that this is not SPDE/INLA's fault, and this intro is very inla/SPDE centric which I'm not sure conveys that. The word covariate is not even mentioned! The main message is that we need to chose covariates that act at a scale appropirate for the mesh/ipoints, not that the mesh and the ipoints can be thought of separately -->
+<!-- Intro: updated with Erin's and my changes to make it shorter and a bit less technical, still open to discussion!  -->
 
 # Main problem
 
-When  using the INLA/SPDE implementation, the model only _sees_ the covariates at the integration points. Therefore, a covariate with a range much shorter than the distance between integration points will cause the model to provide unreliable inference. 
+The Gaussian random field and spatial covariates are evaluated at the same locations, the integration points, across the spatial domain. As SPP are models continuous in space, the continuity of the spatial covariate and spatial random effect are approximated by interpolation between integration points. Therefore, the model will only _see_ the spatial covariates at these defined integration points. If a covariate _actually_ has a range much smaller than the distance between integration points, the model will fail to provide reliable inference. 
 
 ```{r, cropsfigure, fig.cap='In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable', fig.align='center', out.width="130%"}
 
