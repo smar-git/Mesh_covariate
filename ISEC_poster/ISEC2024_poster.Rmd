@@ -153,10 +153,7 @@ ggplot() + geom_spatraster(data = cov1) +
   theme_bw() +
   theme(legend.position   = "none") +
   ggtitle("Covariate 3") + 
-  coord_equal() +
-  
-  plot_layout(ncol = 3)
-
+  coord_equal() 
 ```
 
 Now, let's fit a SPP model to those covariates with 6 slightly varying meshes. The only variation is that the domain of the mesh is slightly shifted in space for each of them. This will cause slightly shifted integration points for each, as these points are located at the vertices of the mesh triangles. 
@@ -190,8 +187,7 @@ ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   xlab("") + ylab("") + theme_void() +
 ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
-  xlab("") + ylab("") + theme_void() +
-  plot_layout(ncol = 2)
+  xlab("") + ylab("") + theme_void() 
 ```
 
 After fitting one model with each mesh to the same point pattern, we can see how the coefficients vary much more for the covariate with the shortest range (Covariate 1), whereas the coefficients for the covariate with the longest range (Covariate 3) are much more stable 
