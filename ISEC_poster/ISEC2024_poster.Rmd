@@ -155,7 +155,7 @@ ggplot() + geom_spatraster(data = cov1) +
   ggtitle("Covariate 3") + 
   coord_equal() +
   
-  plot_layout(ncol = 2)
+  plot_layout(ncol = 3)
 
 ```
 
@@ -190,7 +190,8 @@ ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   xlab("") + ylab("") + theme_void() +
 ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
   coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
-  xlab("") + ylab("") + theme_void() 
+  xlab("") + ylab("") + theme_void() +
+  plot_layout(ncol = 2)
 ```
 
 After fitting one model with each mesh to the same point pattern, we can see how the coefficients vary much more for the covariate with the shortest range (Covariate 1), whereas the coefficients for the covariate with the longest range (Covariate 3) are much more stable 
