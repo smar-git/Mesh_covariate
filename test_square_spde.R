@@ -27,7 +27,7 @@ library(scico)
 library(tidyterra)
 library(scico)
 library(terra)
-library(ggmagnify)
+#library(ggmagnify)
 rm(list = ls())
 
 set.seed(3240)
@@ -68,8 +68,10 @@ cov3 <- rast(nrows = max_dom/res, ncols=max_dom/res, xmin=0, xmax=max_dom, ymin 
 
 ## create meshes and int points -----------------------------------------------------------
 meshes = list()
-meshes[[1]] =  fm_mesh_2d_inla(boundary = poly,
-                               max.edge = c(60,80))
+xy0 = expand.grid(seq(-100,600,50),
+                  seq(-100,600,50))
+meshes[[1]] =  fm_mesh_2d_inla(loc = xy0)#fm_mesh_2d_inla(boundary = poly,
+                              # max.edge = c(60,80))
 
 #ggplot() + gg(meshes[[1]]) + coord_equal()
 n_meshes = 4
@@ -108,7 +110,8 @@ A = inla.spde.make.A(mesh = sim_mesh, loc  = crds(cov1))
 
 
 # covariate that varies in space with a short range!
-range = 7
+covariate_ranges = c(7, 40,600)
+range = covariate_ranges[1]
 sigma = 1
 Q <- inla.spde2.precision(spde = sim_matern,
                           theta = c(log(range),log(sigma)))
@@ -125,7 +128,7 @@ names(cov1) =  "val"
 
 
 # covariate that varies in space with a larger range!
-range = 40
+range = covariate_ranges[2]
 sigma = 1
 Q <- inla.spde2.precision(spde = sim_matern,
                           theta = c(log(range),log(sigma)))
@@ -140,7 +143,7 @@ names(cov2) =  "val"
 #   gg(meshes[[1]]) + coord_equal()+ ggtitle("Covariate 2") + theme_maps
 
 # covariate that varies very smoothly in space
-range = 600
+range = covariate_ranges[3]
 sigma = 1
 Q <- inla.spde2.precision(spde = sim_matern,
                           theta = c(log(range),log(sigma)))
@@ -306,34 +309,37 @@ addSmallLegend <- function(myPlot, pointSize = 0.5, textSize = 7, spaceLegend = 
 
 
 
-p1 = ggplot() + gg(meshes[[1]]) +
-  geom_sf(data = int_points[[1]], aes(  color = weight),
-             size = 1) +  
-  xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80)) 
-p1 = addSmallLegend(p1) + guides(color=guide_legend(title=""))
+pp = rbind(cbind(int_points[[1]], weight = sqrt(int_points[[1]]$weight), nn = 1),
+      cbind(int_points[[2]], weight = sqrt(int_points[[2]]$weight), nn = 2),
+      cbind(int_points[[3]], weight = sqrt(int_points[[3]]$weight), nn = 3),
+      cbind(int_points[[4]], weight = sqrt(int_points[[4]]$weight), nn = 4))
 
-p2 = ggplot() + gg(meshes[[1]]) +
-   geom_sf(data = int_points[[2]], aes(  color = weight),
-           size = 1) +  
-   xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80)) 
-p2 = addSmallLegend(p2) + guides(color=guide_legend(title=""))
- 
- 
-p3 =  ggplot() + gg(meshes[[1]]) +
-   geom_sf(data = int_points[[3]], aes(  color = weight),
-           size = 1) +  
-   xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80)) 
-p3 = addSmallLegend(p3) + guides(color=guide_legend(title=""))
 
- 
- 
-p4 =  ggplot() + gg(meshes[[1]]) +
-   geom_sf(data = int_points[[4]], aes(  color = weight),
-           size = 1) +  
-   xlab("") + ylab("") +coord_sf(xlim = c(0,80), ylim = c(0,80))
-p4 = addSmallLegend(p4) + guides(color=guide_legend(title=""))
+source("presentation/myplotmesh.R")
+mm1 = rbind(my_plot_mesh(meshes[[1]]) %>% mutate(nn = 1),
+            my_plot_mesh(meshes[[2]]) %>% mutate(nn = 2),
+            my_plot_mesh(meshes[[3]]) %>% mutate(nn = 3),
+            my_plot_mesh(meshes[[4]]) %>% mutate(nn = 4))
 
- p1 + p2 + p3 + p4
+out = pp %>% ggplot() +  
+  geom_segment(data = mm1, aes(x = x, xend = xend, y = y, yend = yend),
+               color= "grey") + 
+  geom_sf(aes(  color = weight, size = weight)) + 
+  guides(color= guide_legend(), size=guide_legend(), 
+         color=guide_legend(title=""))+
+  scale_color_viridis_c() + 
+ 
+  facet_wrap(.~nn)  +
+  geom_sf(data = poly, alpha = 0, color = "red")+ 
+  
+  xlab("") + ylab("") + 
+  coord_sf(xlim = c(0,80), ylim = c(0,80))
+
+out
+
+
+
+
 
 ggsave(paste(plot_save_dir, "mesh2.png", sep = "")) 
 
@@ -500,7 +506,7 @@ create_plots = function(mods)
       geom_vline(aes(xintercept = true)) +
         xlab("") + ylab("") +
       theme(axis.text.x=element_text(angle=90))
-    p1
+    p1 = p1 + scale_x_break(c(-500, -15),scales = "free", space=.5) 
       
       p2 = df_fixed %>% filter(param == "cov") %>%
         ggplot() + geom_segment(aes(y = mesh_spde, yend = mesh_spde,
@@ -708,7 +714,15 @@ ggsave(paste(plot_save_dir, "post_sd3.png", sep = ""))
 
 
 
+length_edge = numeric(n_meshes)
+length_edge[1] = max(as.matrix(dist(meshes[[1]]$loc[,-3], ))[which(meshes[[1]]$graph$vv==1)])
+for(i in 2:n_meshes)
+  length_edge[i] = length_edge[i-1]/2  
 
+
+covariate_ranges[1]/length_edge
+covariate_ranges[2]/length_edge
+covariate_ranges[3]/length_edge
 
 
 
