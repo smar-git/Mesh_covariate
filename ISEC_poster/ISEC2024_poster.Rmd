@@ -1,51 +1,50 @@
 ---
 main_topsize: 0.2 #percent coverage of the poster
-main_bottomsize: 0.1
+main_bottomsize: 0.05
 title: '**Spatial Point Processes with INLA: are finer covariate resolutions always better?**'
 author:
   - name: Sara Martino
     affil: 1
     main: true
     email: 'sara.martino@ntnu.no'
-  - name: Leonardo Capitani
+  - name: Jafet Belmont
     affil: 2
+    main: true
+    email: 'Jafet.BelmontOsuna@glasgow.ac.uk'
+  - name: Erin Bryce
+    affil: 2
+    main: true
+    email: 'Erin.Bryce@glasgow.ac.uk'
+  - name: Leonardo Capitani 
+    affil: 3
     main: true
     email: 'leocapi07@gmail.com'
   - name: Virginia Morera-Pujol
-    affil: 3
-    main: true
-    email: 'morera.virginia@gmail.com'
-  - name: Erin Bryce
     affil: 4
     main: true
-    email: ''
-  - name: Jafet Belmont
-    affil: 5
-    main: true
-    email: ''
+    email: 'morera.virginia@gmail.com'
   - name: Megan Morton
-    affil: 6
+    affil: 2
     main: true
-    email: ''
+    email: 'Megan.Laxton@glasgow.ac.uk'
   - name: Janine Illian 
-    affil: 7
+    affil: 2
     main: true
-    email: ''
-    
+    email: 'Janine.Illian@glasgow.ac.uk'
+
 affiliation:
   - num: 1
     address: Department of Mathematical Sciences, Norwegian University of Science and Technology
   - num: 2
-    address: Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland
+    address: School of Mathematics and Statistics, University of Glasgow
   - num: 3
-    address: Laboratory of Wildlife Ecology and Behaviour, School of Biology and Environmental Science, Univ. College Dublin, Dublin, Ireland
+    address: Swiss Federal Institute for Forest, Snow and Landscape Research WSL, Birmensdorf, Switzerland
+  - num: 4
+    address: School of Biology and Environmental Science, University College Dublin
 
 main_findings:
-  - "**Innacurate covariates resolutions within INLA/SPDE lead to unreliable numerical integration and biased parameter estimates**"
+  - "The model only *sees* the covariate values at the integration points. Therefore, **the integration scheme and the covariates need to have similar resolution**"
   
-logoleft_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
-logoright_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
-logocenter_name: https&#58;//raw.githubusercontent.com/jhollway/iheiddown/main/man/figures/iheiddown.png
 output: 
   iheiddown::iheiddown_betterport:
     self_contained: false
@@ -69,100 +68,162 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.table.format = "html") 
 ```
 
-# Introduction
+<!--# Author's order: I think we agreed Sara first and then alphabetical order and that's how's in the abstract so leaving it like that! -->
 
-<!--# Author's order: Which is the author's order on the abstract? Please Virginia take care of this as you have it on your laptop.-->
+# Rationale
 
-In ecology, spatial point processes (SPP) have become a popular
-statistical tool to model presence only data, both on their own, and as
-a building block for model complex models (i.e. integrated species
-distribution models). However, inference on SPP, particularly when
-incorporating spatially explicit random effects, poses significant
-complexity. A common strategy involves adopting the so-called
-log-Gaussian Cox process (LGCP) and relying on the INLA/SPDE
-implementation for efficient inference. Central to this approach is the
-representation of a spatially continuous Gaussian random field as the
-solution of a stochastic partial differential equation (SPDE) defined
-over a triangular mesh spanning the spatial domain. The mesh definition
-is an important part of the model implementation. Equally crucial, yet
-often overlooked, is the role of integration points employed in
-numerically solving the stochastic integral inherent in the LGCP
-likelihood.
+In ecology, spatial point processes (SPP) are a statistical methodology that are becoming increasingly popular through their implementation using INLA/SPDE as an inference technique. Key to this approach is the representation of a spatially continuous Gaussian random field, defined over a triangular mesh spanning the spatial domain. Crucial to model implementation is the choice of spatial information (covariates). The resolution and scale of these needs to be taken into account when designing the mesh and associated integration scheme. 
 
-## Objectives
+<!-- Intro: updated with Erin's and my changes to make it shorter and a bit less technical, still open to discussion!  -->
 
-1.  Pick a template layout.
-2.  Write/ create your poster content distraction free.
-3.  Press `CTRL+K` and let `{iheiddown}` do its thing!
+# Main problem
 
-Read the guide below (mostly identical to posterdown). It will make you
-familiar with the ways of creating a great poster.
+The Gaussian random field and spatial covariates are evaluated at the same locations, the integration points, across the spatial domain. As SPP are models continuous in space, the continuity of the spatial covariate and spatial random effect are approximated by interpolation between integration points. Therefore, the model will only _see_ the spatial covariates at these defined integration points. If a covariate _actually_ has a range much smaller than the distance between integration points, the model will fail to provide reliable inference. 
 
-# Methods
+```{r, cropsfigure, fig.cap='In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable', fig.align='center', out.width="130%"}
 
-I will show here how to include poster elements that may be useful, such
-as an equation using mathjax:
+library(tidyterra)
+library(ggplot2)
+library(terra)
+
+crops <- rast("ISEC_poster/crops.grd")
+crops <- trim(crops)
+
+ggplot() +
+  geom_spatraster(data = crops) +
+  scale_fill_whitebox_c(
+    palette = "muted",
+    labels = scales::label_number(suffix = "%"),
+    n.breaks = 12,
+    guide = guide_legend(reverse = TRUE)
+  ) +
+  
+  labs(
+    fill = "",
+    title = "Planted vegetation and crops",
+    subtitle = "Based on the CORINE 2016 data"
+  ) + 
+  theme_bw()
+```
+
+<!-- Is there a way to centre this figure and the covariates one? Ive used fig.align in the chunk options but they are weirdly aligned to the right of the column  -->
+
+
+# An example
+
+Let's picture three covariates with very different ranges: 
+
+```{r, covars, fig.cap='Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600', fig.align='left', out.width="130%"}
+
+library(ggplot2)
+library(terra)
+library(tidyterra)
+library(scico)
+library(patchwork)
+
+cov1 <- rast("ISEC_poster/cov1.grd")
+cov2 <- rast("ISEC_poster/cov2.grd")
+cov3 <- rast("ISEC_poster/cov3.grd")
+
+ggplot() + geom_spatraster(data = cov1) + 
+  scale_fill_scico(na.value = "transparent") + 
+  theme_bw() +
+  theme(legend.position  = "none") +
+  ggtitle("Covariate 1") + 
+  coord_equal() +
+  
+  ggplot() + geom_spatraster(data = cov2) + 
+  scale_fill_scico(na.value = "transparent") + 
+  theme_bw() +
+  theme(legend.position   = "none") +
+  ggtitle("Covariate 2") + 
+  coord_equal() +
+  
+  ggplot() + geom_spatraster(data = cov3) + 
+  scale_fill_scico(na.value = "transparent") + 
+  theme_bw() +
+  theme(legend.position   = "none") +
+  ggtitle("Covariate 3") + 
+  coord_equal() 
+```
+
+Now, let's fit a SPP model to those covariates with 6 slightly varying meshes. The only variation is that the domain of the mesh is slightly shifted in space for each of them. This will cause slightly shifted integration points for each, as these points are located at the vertices of the mesh triangles. 
+
+```{r, meshes, fig.cap='This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.', out.width="90%"}
+
+library(tidyterra)
+library(ggplot2)
+library(terra)
+library(inlabru)
+library(scico)
+library(patchwork)
+
+meshes <- readRDS("ISEC_poster/random_meshes.RDS")
+poly <- readRDS("ISEC_poster/random_poly.RDS")
+
+ggplot() + gg(meshes[[1]]) +  geom_sf(data = poly, alpha = 0, color = "red") +
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600)) + ggtitle("Mesh 1") +
+  xlab("") + ylab("")  + theme_void() + 
+ggplot() + gg(meshes[[2]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 2") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[3]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 3") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[4]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 4") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 5") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
+  xlab("") + ylab("") + theme_void() 
+```
+
+After fitting one model with each mesh to the same point pattern, we can see how the coefficients vary much more for the covariate with the shortest range (Covariate 1), whereas the coefficients for the covariate with the longest range (Covariate 3) are much more stable 
 
 $$
-E = mc^2
+log(\lambda(s)) = \beta_{0} + \beta_{1}Covariate
 $$
 
-To reference a citation you can add your `.bib` file to the working
-directory and name it in the YAML metadata or generate an automated one
-as done here, then you only need to reference the label value in the
-`.bib` file [@dambly2023]. For example this package is built on top of
-the wonderful {pagedown} package and I will cite it at the end of this
-sentence using this in the rmd [@pagedown].
 
-To get a better understanding of how to include features like these
-please refer to the {iheiddown}
-[wiki](https://github.com/iheiddown/wiki).
 
-***Now on to the results!***
+```{r, coefficients, fig.cap='This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.', out.width="90%"}
 
-# Results
+library(tidyterra)
+library(ggplot2)
+library(terra)
+library(inlabru)
+library(scico)
+library(patchwork)
 
-Here you may have some figures to show off, bellow I have made a
-scatterplot with the infamous Iris dataset and I can even reference to
-the figure automatically like this, `Figure \@ref(fig:irisfigure)`,
-Figure \@ref(fig:irisfigure).
+coefs <- readRDS("ISEC_poster/model_coefficients.RDS")
 
-```{r, irisfigure, fig.cap='Here is a caption for the figure. This can be added by using the "fig.cap" option in the r code chunk options, see this [link](https://yihui.name/knitr/options/#plots) from the legend himself, [Yihui Xie](https://twitter.com/xieyihui).', out.width="80%"}
-par(mar=c(2,2,0,1))
-plot(x = iris$Sepal.Length, y = iris$Sepal.Width,
-     col = iris$Species, pch = 19, xlab = "Sepal Length",
-     ylab = "Sepal Width")
+coefs %>% 
+  filter(names=="cov") %>%
+  mutate(cov = dplyr::case_match(cov, 
+                          "Cov1" ~ "Covariate 1", 
+                          "Cov2" ~ "Covariate 2", 
+                          "Cov3" ~ "Covariate 3"), 
+         int_points = dplyr::case_match(int_points, 
+                                        "mesh 1" ~ 1,
+                                        "mesh 2" ~ 2,
+                                        "mesh 3" ~ 3,
+                                        "mesh 4" ~ 4,
+                                        "mesh 5" ~ 5,
+                                        "mesh 6" ~ 6,)) %>% 
+  ggplot() + geom_point(aes(x = mean, y = int_points)) +
+  geom_segment(aes(y = int_points, yend  = int_points, x = `0.025quant`, xend = `0.975quant`)) +
+  geom_vline(aes(xintercept = true), linetype = "dashed") + 
+  scale_y_continuous(breaks = 1:6, labels = 1:6) +
+  facet_grid(.~cov, scales = "free") +
+  labs(y = "Mesh", x = "Mean covariate effect", title = "Covariate effect") + 
+  theme_bw() + 
+  coord_flip()
+
 ```
 
-Maybe you want to show off some of that fancy code you spent so much
-time on to make that figure, well you can do that too! Just use the
-`echo=TRUE` option in the r code chunk options, Figure
-\@ref(fig:myprettycode)!
-
-```{r myprettycode, echo=TRUE, fig.cap='Boxplots, so hot right now!', fig.height=6, out.width="80%"}
-#trim whitespace
-par(mar=c(2,2,0,0))
-#plot boxplots
-boxplot(iris$Sepal.Width~iris$Species,
-        col = "#ed2215", 
-        border = "#800000",
-        ylab = "Sepal Width (cm)",
-        xlab = "Species")
-```
-
-How about a neat table of data? See, Table \@ref(tab:iristable):
-
-```{r, iristable}
-knitr::kable(
-  iris[1:15,1:5], format = "html",
-  caption = "A table made with the **knitr::kable** function.",
-  align = "c", col.names = c("Sepal <br> Length",
-                             "Sepal <br> Width",
-                             "Petal <br> Length",
-                             "Petal <br> Width",
-                             "Species"),
-  escape = FALSE)
-```
 
 # Conclusions
 
