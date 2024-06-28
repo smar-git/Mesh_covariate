@@ -423,58 +423,67 @@ Sara Martino<sup> 1</sup><br>
 </p>
 </div>
 
-<!--# Author's order: I think we agreed Sara first and then alphabetical order and that's how's in the abstract so leaving it like that! -->
 <div id="rationale" class="section level1">
 <h1>Rationale</h1>
-<p>In ecology, spatial point processes (SPP) have become a popular
-statistical tool, and INLA/SPDE an efficient method to implement
-them and make efficient inference. Central to this approach is the
-representation of a spatially continuous Gaussian random field as the
-solution of a stochastic partial differential equation (SPDE) defined
-over a triangular mesh spanning the spatial domain. Although the mesh definition
-is an important part of the model implementation. Equally crucial, yet
-often overlooked, is the role of integration points employed in
-numerically solving the stochastic integral inherent in the LGCP
-likelihood.</p>
-<!-- Intro: I would love this to be a bit shorter and maybe a bit less technical, worth giving it some thought. Also need to make sure we convey the message that this is not SPDE/INLA's fault, and this intro is very inla/SPDE centric which I'm not sure conveys that. The word covariate is not even mentioned! The main message is that we need to chose covariates that act at a scale appropirate for the mesh/ipoints, not that the mesh and the ipoints can be thought of separately -->
+<p>In ecology, spatial point processes (SPP) are a statistical methodology
+that are becoming increasingly popular through their implementation
+using INLA/SPDE as an inference technique. Key to this approach is the
+representation of a spatially continuous Gaussian random field, defined
+over a triangular mesh spanning the spatial domain. Crucial to model
+implementation is the choice of spatial information (covariates). The
+resolution and scale of these needs to be taken into account when
+designing the mesh and associated integration scheme.</p>
+<!-- Intro: updated with Erin's and my changes to make it shorter and a bit less technical, still open to discussion!  -->
 </div>
 <div id="main-problem" class="section level1">
 <h1>Main problem</h1>
-<p>When using the INLA/SPDE implementation, the model only <em>sees</em> the covariates at the integration points. Therefore, a covariate with a range much shorter than the distance between integration points will cause the model to provide unreliable inference.</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:cropsfigure"></span>
-<img src="ISEC2024_poster_files/figure-html/cropsfigure-1.png" alt="In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable" width="130%" />
-<p class="caption">
-Figure 1: In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable
-</p>
-</div>
+<p>The Gaussian random field and spatial covariates are evaluated at the
+same locations, the integration points, across the spatial domain. As
+SPP are models continuous in space, the continuity of the spatial
+covariate and spatial random effect are approximated by interpolation
+between integration points. Therefore, the model will only <em>see</em> the
+spatial covariates at these defined integration points. If a covariate
+<em>actually</em> has a range much smaller than the distance between
+integration points, the model will fail to provide reliable inference.</p>
+<p><img src="Figure_1.png" /></p>
+<p><font size="7"> <strong>Figure 1</strong>: In environmental variables with very short
+range like the one pictured below, the values change from 100 to 0 in
+very short distances. If the resolution of the integration points is not
+small enough to capture this short range, the model will struggle to
+infer the effect of the covariate, and the coefficients produced will be
+unreliable </font></p>
 <!-- Is there a way to centre this figure and the covariates one? Ive used fig.align in the chunk options but they are weirdly aligned to the right of the column  -->
+<!--# I've just tried using the Markdown/Latex sysntax instead of using R chunks. You can inseret a figure by sekect Insert - Figure from the top bar of the RMarkdown aditor -->
 </div>
 <div id="an-example" class="section level1">
 <h1>An example</h1>
 <p>Let’s picture three covariates with very different ranges:</p>
-<div class="figure" style="text-align: left"><span style="display:block;" id="fig:covars"></span>
-<img src="ISEC2024_poster_files/figure-html/covars-1.png" alt="Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600" width="130%" />
-<p class="caption">
-Figure 2: Three covariates randomly generated. Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600
-</p>
-</div>
-<p>Now, let’s fit a SPP model to those covariates with 6 slightly varying meshes. The only variation is that the domain of the mesh is slightly shifted in space for each of them. This will cause slightly shifted integration points for each, as these points are located at the vertices of the mesh triangles.</p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:meshes"></span>
-<img src="ISEC2024_poster_files/figure-html/meshes-1.png" alt="This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too." width="90%" />
-<p class="caption">
-Figure 3: This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.
-</p>
-</div>
-<p>After fitting one model with each mesh to the same point pattern, we can see how the coefficients vary much more for the covariate with the shortest range (Covariate 1), whereas the coefficients for the covariate with the longest range (Covariate 3) are much more stable</p>
+<p><img src="Figure2.png" /></p>
+<p><font size="7"> <strong>Figure 2</strong>: Three covariates randomly generated.
+Covariate 1 has a range of 10, Covariate 2 has a range of 50, and
+covariate 3 has a range of 600 </font></p>
+<p>Now, let’s fit a SPP model to those covariates with 6 slightly varying
+meshes. The only variation is that the domain of the mesh is slightly
+shifted in space for each of them. This will cause slightly shifted
+integration points for each, as these points are located at the vertices
+of the mesh triangles.</p>
+<p><img src="Figure_3.png" width="963" /></p>
+<p><font size="7"> <strong>Figure 3</strong>: This six meshes have been created with
+exaclty the same parameter, except that the iner boundary is shifted in
+space a little bit for each of them. That makes the integration points
+that are the vertices of the triangles shift a little too </font></p>
+<p>After fitting one model with each mesh to the same point pattern, we can
+see how the coefficients vary much more for the covariate with the
+shortest range (Covariate 1), whereas the coefficients for the covariate
+with the longest range (Covariate 3) are much more stable</p>
 <p><span class="math display">\[
 log(\lambda(s)) = \beta_{0} + \beta_{1}Covariate
 \]</span></p>
-<div class="figure" style="text-align: center"><span style="display:block;" id="fig:coefficients"></span>
-<img src="ISEC2024_poster_files/figure-html/coefficients-1.png" alt="This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too." width="90%" />
-<p class="caption">
-Figure 4: This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.
-</p>
-</div>
+<p><img src="Figure_4.png" width="963" /></p>
+<p><font size="7"> <strong>Figure 4</strong>: This six meshes have been created with
+exaclty the same parameter, except that the iner boundary is shifted in
+space a little bit for each of them. That makes the integration points
+that are the vertices of the triangles shift a little too. </font></p>
 </div>
 <div id="conclusions" class="section level1">
 <h1>Conclusions</h1>
