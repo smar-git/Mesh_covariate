@@ -476,6 +476,10 @@ create_plots = function(mods)
   plots_cov = list()
   plots_range = list()
   plots_sd = list()
+  
+  df_fixed_all = c()
+  df_hyper_all = c()
+  
   for(idx_mesh in 1:n_meshes)
   { 
     err = purrr::map(mods[[idx_mesh]],function(x) x$error )
@@ -551,6 +555,10 @@ create_plots = function(mods)
    p4 
    plots_range[[idx_mesh]] =    p3
    plots_sd[[idx_mesh]] =    p4
+   
+   df_fixed_all = rbind(df_fixed_all, df_fix)
+   df_hyper_all = rbind(df_hyper_all, df_hyper)
+   
   }
 return(list(covariate  = plots_cov,
         intercept = plots_int,
