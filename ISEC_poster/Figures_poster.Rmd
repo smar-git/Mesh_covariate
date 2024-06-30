@@ -1,0 +1,153 @@
+---
+title: "Figures"
+output: html_document
+date: "`r Sys.Date()`"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Figure 1
+
+```{r cropsfigure, fig.cap ='In environmental variables with very short range like the one pictured below, the values change from 100 to 0 in very short distances. If the resolution of the integration points is not small enough to capture this short range, the model will struggle to infer the effect of the covariate, and the coefficients produced will be unreliable', fig.align='center', out.width="130%"}
+
+library(tidyterra)
+library(ggplot2)
+library(terra)
+
+crops <- rast(here("ISEC_poster","crops.grd"))
+crops <- trim(crops)
+
+(p1 <- ggplot() +
+  geom_spatraster(data = crops) +
+  scale_fill_whitebox_c(
+    palette = "muted",
+    labels = scales::label_number(suffix = "%"),
+    n.breaks = 12,
+    guide = guide_legend(reverse = TRUE)
+  ) +
+  
+  labs(
+    fill = "",
+    title = "Planted vegetation and crops",
+    subtitle = "Based on the CORINE 2016 data"
+  ) + 
+  theme_bw()
+)
+
+
+```
+
+## Figure 2
+
+```{r covariates, fig.cap='Three covariates randomly generated.Covariate 1 has a range of 10, Covariate 2 has a range of 50, and covariate 3 has a range of 600'}
+
+library(ggplot2)
+library(terra)
+library(tidyterra)
+library(scico)
+library(patchwork)
+
+cov1 <- rast("ISEC_poster/cov1.grd")
+cov2 <- rast("ISEC_poster/cov2.grd")
+cov3 <- rast("ISEC_poster/cov3.grd")
+
+p1 <- ggplot() + geom_spatraster(data = cov1) + 
+  scale_fill_scico(na.value = "transparent") + 
+  theme_bw() +
+  theme(legend.position  = "none") +
+  ggtitle("Covariate 1") + 
+  coord_equal() 
+  
+p2 <-   ggplot() + geom_spatraster(data = cov2) + 
+  scale_fill_scico(na.value = "transparent") + 
+  theme_bw() +
+  theme(legend.position   = "none") +
+  ggtitle("Covariate 2") + 
+  coord_equal() 
+  
+p3 <-   ggplot() + geom_spatraster(data = cov3) + 
+  scale_fill_scico(na.value = "transparent") + 
+  theme_bw() +
+  theme(legend.position   = "none") +
+  ggtitle("Covariate 3") + 
+  coord_equal() 
+
+p4 <- p1 + p2 + p3 + plot_layout(nrow = 2, byrow = T)
+
+#ggsave()
+```
+
+## Figure 3
+
+```{r, meshes, fig.cap='This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.', out.width="90%"}
+
+library(tidyterra)
+library(ggplot2)
+library(terra)
+library(inlabru)
+library(scico)
+library(patchwork)
+
+meshes <- readRDS(here("ISEC_poster","random_meshes.RDS"))
+poly <- readRDS(here("ISEC_poster","random_poly.RDS"))
+
+ggplot() + gg(meshes[[1]]) +  geom_sf(data = poly, alpha = 0, color = "red") +
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600)) + ggtitle("Mesh 1") +
+  xlab("") + ylab("")  + theme_void() + 
+ggplot() + gg(meshes[[2]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 2") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[3]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 3") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[4]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 4") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[5]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 5") +
+  xlab("") + ylab("") + theme_void() +
+ggplot() + gg(meshes[[6]]) +  geom_sf(data = poly, alpha = 0, color = "red")+
+  coord_sf(xlim = c(-100,600), ylim = c(-100,600))+ ggtitle("Mesh 6") +
+  xlab("") + ylab("") + theme_void() 
+```
+
+## Figure 4
+
+```{r, coefficients, fig.cap='This six meshes have been created with exaclty the same parameter, except that the iner boundary is shifted in space a little bit for each of them. That makes the integration points that are the vertices of the triangles shift a little too.', out.width="90%"}
+
+library(tidyterra)
+library(ggplot2)
+library(terra)
+library(inlabru)
+library(scico)
+library(patchwork)
+
+coefs <- readRDS(here("ISEC_poster","model_coefficients.RDS"))
+
+coefs %>% 
+  filter(names=="cov") %>%
+  mutate(cov = dplyr::case_match(cov, 
+                          "Cov1" ~ "Covariate 1", 
+                          "Cov2" ~ "Covariate 2", 
+                          "Cov3" ~ "Covariate 3"), 
+         int_points = dplyr::case_match(int_points, 
+                                        "mesh 1" ~ 1,
+                                        "mesh 2" ~ 2,
+                                        "mesh 3" ~ 3,
+                                        "mesh 4" ~ 4,
+                                        "mesh 5" ~ 5,
+                                        "mesh 6" ~ 6,)) %>% 
+  ggplot() + geom_point(aes(x = mean, y = int_points)) +
+  geom_segment(aes(y = int_points, yend  = int_points, x = `0.025quant`, xend = `0.975quant`)) +
+  geom_vline(aes(xintercept = true), linetype = "dashed") + 
+  scale_y_continuous(breaks = 1:6, labels = 1:6) +
+  facet_grid(.~cov, scales = "free") +
+  labs(y = "Mesh", x = "Mean covariate effect", title = "Covariate effect") + 
+  theme_bw() + 
+  coord_flip()
+
+```
