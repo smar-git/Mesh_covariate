@@ -95,10 +95,10 @@ integration points, the model will fail to provide reliable inference.
 
 ![](Figure_1.png){width="1150"}
 
-<font size="6.5"> **Figure 1**: In environmental variables with very short
-range like the one pictured below, the values change from 100 to 0 in
-very short distances. If the resolution of the integration points is not
-small enough to capture this short range, the model will struggle to
+<font size="6.5"> **Figure 1**: In environmental variables with very
+short range like the one pictured below, the values change from 100 to 0
+in very short distances. If the resolution of the integration points is
+not small enough to capture this short range, the model will struggle to
 infer the effect of the covariate, and the coefficients produced will be
 unreliable </font>
 

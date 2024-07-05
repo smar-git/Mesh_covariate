@@ -433,7 +433,6 @@ over a triangular mesh spanning the spatial domain. Crucial to model
 implementation is the choice of spatial information (covariates). The
 resolution and scale of these needs to be taken into account when
 designing the mesh and associated integration scheme.</p>
-<!-- Intro: updated with Erin's and my changes to make it shorter and a bit less technical, still open to discussion!  -->
 </div>
 <div id="main-problem" class="section level1">
 <h1>Main problem</h1>
@@ -445,21 +444,19 @@ between integration points. Therefore, the model will only <em>see</em> the
 spatial covariates at these defined integration points. If a covariate
 <em>actually</em> has a range much smaller than the distance between
 integration points, the model will fail to provide reliable inference.</p>
-<p><img src="Figure_1.png" /></p>
-<p><font size="7"> <strong>Figure 1</strong>: In environmental variables with very short
-range like the one pictured below, the values change from 100 to 0 in
-very short distances. If the resolution of the integration points is not
-small enough to capture this short range, the model will struggle to
+<p><img src="Figure_1.png" width="1150" /></p>
+<p><font size="6.5"> <strong>Figure 1</strong>: In environmental variables with very
+short range like the one pictured below, the values change from 100 to 0
+in very short distances. If the resolution of the integration points is
+not small enough to capture this short range, the model will struggle to
 infer the effect of the covariate, and the coefficients produced will be
 unreliable </font></p>
-<!-- Is there a way to centre this figure and the covariates one? Ive used fig.align in the chunk options but they are weirdly aligned to the right of the column  -->
-<!--# I've just tried using the Markdown/Latex sysntax instead of using R chunks. You can inseret a figure by sekect Insert - Figure from the top bar of the RMarkdown aditor -->
 </div>
 <div id="an-example" class="section level1">
 <h1>An example</h1>
 <p>Let’s picture three covariates with very different ranges:</p>
-<p><img src="Figure2.png" /></p>
-<p><font size="7"> <strong>Figure 2</strong>: Three covariates randomly generated.
+<p><img src="Figure2.png" width="1100" /></p>
+<p><font size="6.5"> <strong>Figure 2</strong>: Three covariates randomly generated.
 Covariate 1 has a range of 10, Covariate 2 has a range of 50, and
 covariate 3 has a range of 600 </font></p>
 <p>Now, let’s fit a SPP model to those covariates with 6 slightly varying
@@ -467,8 +464,8 @@ meshes. The only variation is that the domain of the mesh is slightly
 shifted in space for each of them. This will cause slightly shifted
 integration points for each, as these points are located at the vertices
 of the mesh triangles.</p>
-<p><img src="Figure_3.png" width="963" /></p>
-<p><font size="7"> <strong>Figure 3</strong>: This six meshes have been created with
+<p><img src="Figure_3.png" width="1100" /></p>
+<p><font size="6.5"> <strong>Figure 3</strong>: This six meshes have been created with
 exaclty the same parameter, except that the iner boundary is shifted in
 space a little bit for each of them. That makes the integration points
 that are the vertices of the triangles shift a little too </font></p>
@@ -479,8 +476,8 @@ with the longest range (Covariate 3) are much more stable</p>
 <p><span class="math display">\[
 log(\lambda(s)) = \beta_{0} + \beta_{1}Covariate
 \]</span></p>
-<p><img src="Figure_4.png" width="963" /></p>
-<p><font size="7"> <strong>Figure 4</strong>: This six meshes have been created with
+<p><img src="Figure_4.png" width="1100" /></p>
+<p><font size="6.5"> <strong>Figure 4</strong>: This six meshes have been created with
 exaclty the same parameter, except that the iner boundary is shifted in
 space a little bit for each of them. That makes the integration points
 that are the vertices of the triangles shift a little too. </font></p>
@@ -492,9 +489,6 @@ these challenges and offer guidelines to empower users in navigating
 these complexities and mitigating potential pitfalls when using these
 methods in ecological applications such as species distribution models
 based on presence-only data.</p>
-</div>
-<div id="references" class="section level1">
-<h1>References</h1>
 </div>
 
 </div>
