@@ -1,0 +1,13 @@
+---
+title: "Leo's notebook"
+format: html
+editor: visual
+---
+
+From Moraga, Paula. (2023). Spatial Statistics for Data Science: Theory and Practice with R. Chapman & Hall/CRC Data Science Series. ISBN 9781032633510ed
+
+##  *Solanum* plant species in Bolivia
+
+Here, we show how to formulate and fit a LGCP model for *Solanum* plant species in Bolivia using a continuously Gaussian random field with INLA and SPDE.
+
+<https://www.paulamoraga.com/book-spatial/point-process-modeling.html#observed-solanum-plant-species-in-bolivia>
